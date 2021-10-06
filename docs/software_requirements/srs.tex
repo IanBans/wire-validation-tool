@@ -1,0 +1,46 @@
+\documentclass[letterpaper,12pt]{article}
+\nonstopmode
+
+% Document Information
+%
+\title{Project Name\\Software Requirements Specification}
+\author{Team Members Names'}
+
+
+% Packages 
+%
+\usepackage[margin=1in,letterpaper]{geometry}
+\usepackage{tabularx}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+  Version: 1.0
+\end{center}
+
+\vfill
+\begin{tabularx}{\linewidth}{|l|l|l|X|}\hline
+Ver. & Date & Who & Change \\\hline
+     &      &     &        \\\hline
+     &      &     &        \\\hline
+     &      &     &        \\\hline
+     &      &     &        \\\hline
+     &      &     &        \\\hline
+\end{tabularx}
+
+\newpage
+\input{introduction.tex}
+\input{description.tex}
+\input{features.tex}
+\input{external.tex}
+\input{nonfunction.tex}
+
+
+\appendix 
+\input{glossary.tex}
+\input{models.tex}
+\input{issues.tex}
+
+
+\end{document}
