@@ -2,7 +2,7 @@
 Now that we know what the customer needs, 
 what will the solution look like? 
 \subsection{Vision Statement}
- This is the formal vision statement.  
+    PACCAR provides completely customizable trucks to their clients. However, with trucks and electronics becoming increasingly more complex, organizing all electrical component and their wires becomes increasingly difficult. Our team will create software that will read all the electrical components for a truck, organize data wire by wire, and validate the schematics will work against certain errors or oversights.  
  \begin{tabular}{ll}
  For:         &user class\\
  Who:         &statement of need\\
@@ -12,10 +12,16 @@ what will the solution look like?
  Our Product: &differentiation statement  \\
  \end{tabular}  
 \subsection{Major Features}
- Describe the major features that solve the customer's needs.
+
+•	Read documents of a certain format and parse all wiring information needed
+•	Export a document (pdf or excel spreadsheet) that organizes data by the wire showing all wire details and the start and end point.
+•	Create a simple graphical user interface that will allow the user to search and upload files as well as give status updates.
+•	The program will examine the current going through various wire gauges and will determine if any wire may pose a risk of overheating.
 
 \subsection{Assumptions and Dependencies}
  What does this product depend on?  
- The goal here is to describe, with as much detail as possible, what the envisioned
- solution needs to operate.  
+o	Input will come in the form of Microsoft Excel Sheets. Column names and number of columns may slightly vary. 
+o	Output needs to be well organized to be readable by human eyes. 
+o	Program must be open to extension to test wire reports for different possible failures.
+
 
