@@ -5,25 +5,23 @@
 
 
 \subsection{Purpose}
- What is the purpose of this document as opposed to the vision and scope,
- software design document (492), testing plan (493), et al.
+The purpose of this software requirement specifications document is to outline the functional and nonfunctional requirements for the PACCAR wire validation project. This document is intended to be used by the Western development team to outline project requirements before implementation
 
 \subsection{Document Conventions}
- Describe the conventions used in this document.  For example, throughout this
- document, the use of the plural shall imply the singular unless otherwise
- stated.  Now you can avoid parenthetical plurals like students.   
+ The following terms will be used throughout the document:
+
+“The project”, “the application”, and “the product” refer to the wire validation software whose requirements are specified in this document.
+
+“The team” refers to the developers of the application; Ian Bansenauer, Ian McCleary, Jaden Breeland, and Martin Armanasu.
+
+“The client” or “the users” refers to PACCAR and any of its employees who use the application.
 
 \subsection{Intended Audience and Reading Suggestions}
- Formally state the intended audience for this document.  For the SRS, the
- audience is usually developers, quality control, and documentation.  You are
- free to describe whatever readers you feel are appropriate, but you should not
- describe the reader in terms of the class.  That is, do not refer to a teacher
- or other students.  
+ This document was created for use by the team in designing software requirements. We have designed this document using layman's terminology so no outside readings are required for understanding the domain. Readers should have a basic idea of the contents of a wiring diagram.
 
 \subsection{Project Scope}
- Put this developed project in the context of the overall product.  This is a
- brief summary of the vision and scope.  Just enough for the reader to
- understand the context for the requirements in later sections.
+PACCAR designs and builds highly customizable trucks for their clients. Organizing multiple wire schematics in order to validate the design of the electrical components of the truck is a time-consuming task. This project will read the wiring diagrams for a truck, organize the data about each wire, and provide a streamlined output for easier validation of the components and wiring of the truck.
+
 
 \subsection{References}
  List other documents that you refer to in the rest of this document.  Include
