@@ -1,31 +1,29 @@
 \section{Other Nonfunctional Requirements}
- Nonfunctional requirements are shall-statements about how the software
- performs or is written.  It is not a statement about what the software does.
- For example, the function requirements for a Fibonacci function is this: the
- function shall return the nth Fibonacci number when provided n as input.  A
- nonfunctional requirement would be these: the function shall take time O(n)
- and all lines of the software shall be reachable by some test-case.
-
 
 \subsection{Performance Requirements}
- Your project will have performance requirements.  How long is the user willing
- to wait for the different features to execute?   For example, the software
- shall authenticate authorized users withing 250ms.   
-
-\subsection{Safety Requirements}
- It is unlikely that your project will have any safety requirements.  This
- section would be used for software that controls a physical device that could
- potentially cause harm.  
+The application shall run in at-most polynomial time with regards to the number of rows in the input.
 
 \subsection{Security Requirements}
- Do not overlook this section.  Consider the three primary topics of computer
- security: Confidentiality, Integrity, and Availability.   Your project will
- have security requirements. 
+\begin{enumerate}
+ \item The application should not access the internet
+ \item The application should not share nor store diagram information besides the output file.
+ \item The application should be easy to install for someone with little computer knowledge.
+\end{enumerate}
 
 
 \subsection{Software Quality Attributes}
- Quality requirements can be the most difficult to write.  The desired quality
- must be written in a meaningful and testable way.  For example, All functions
- within the software shall have a cyclomatic number less than 10.  
+\begin{enumerate}
+
+ \item Correctness: The application should accurately validate wire paths
+ \item Efficiency: The application should provide an accurate output in less time than validating the inputs by hand.
+ \item Accuracy: The application should be 100\% accurate, because employees will rely on the results for further validation steps.
+ \item Compatibility: The application should run on current and future Windows machines.
+ \item Transferability: The application should be easy to transfer to another machine.
+
+\end{enumerate}
+
+
+
+
 
 
