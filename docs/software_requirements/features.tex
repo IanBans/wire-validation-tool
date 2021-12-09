@@ -1,24 +1,94 @@
 \section{Features}
- This section contains a list of requirement statements.  This should be of the
- form "the system shall..."  and worded in a way that satisfaction of the
- requirement can be verified.  For example, the software shall authenticate
- users with at least two identification factors.  
 
-
- [For Each Feature]
-\subsection{Name of feature}
+\subsection{Read/write from CSV and XLS}
 \subsubsection{Description}
- Describe the feature and how it fits into the overall product.  
+The software shall read from and write to .csv and .xlsx documents
 
 \subsubsection{Priority}
- Describe the relative importance of this feature. 
+High 
 
 \subsubsection{Stimulus and Response}
- What event will trigger the feature and how should the system respond.  This
- is probably an excerpt of a use case. 
+ A user selects the documents from their hard drive through the file picker. The software will read the documents and write the results to a separate file
 
 \subsubsection{Functional Requirements}
- Formally state the functional requirement.
- The low-level format command shall require authorization by two
- system-administrators before beginning the low-level format operation.
+ 
+ The software shall read data from the selected .xlsx/csv documents when selected
+ and write output data to an .xlsx document upon completion.
+ 
+ \subsection{Splice Handling}
+\subsubsection{Description}
+ The software shall output a separate row in the spreadsheet for each output of a splice
+\subsubsection{Priority}
+High
 
+\subsubsection{Stimulus and Response}
+When a spliced wire is detected in the input, the software shall show each output of the splice in a separate row in the output Excel document.
+
+\subsubsection{Functional Requirements}
+ The software shall display the outputs of wire splices in separate rows of the output.
+ 
+  \subsection{Output Columns}
+\subsubsection{Description}
+The software shall output the following information for each wire:
+Start Pin, End Pin, Fuse Rating. Wire Size, Circuit Function.
+\subsubsection{Priority}
+High
+
+\subsubsection{Stimulus and Response}
+The software reads this information from the inputted documents and compiles the information about each wire into an output document  as specified in requirement 3.3
+
+\subsubsection{Functional Requirements}
+ The software shall compile the above information into one output document.
+ 
+\subsection{Build to Windows}
+\subsubsection{Description}
+ The software will build to and run on a Windows PC
+\subsubsection{Priority}
+High
+\subsubsection{Stimulus and Response}
+The software is operational on the Windows operating system
+\subsubsection{Functional Requirements}
+The software shall be installable upon, and run on a Windows P.C.
+
+  \subsection{Graphical User Interface}
+\subsubsection{Description}
+ The software will display a Graphical User Interface (GUI) that allows users to pick files, modify parameters, and see status of processing. 
+\subsubsection{Priority}
+Medium.
+
+\subsubsection{Stimulus and Response}
+The software responds to user input and displays data through a graphical interface.
+
+\subsubsection{Functional Requirements}
+The software shall display a GUI that allows users to pick the input files and output location, specify names of columns to include, and show processing status
+ 
+  \subsection{Minimum Wire CSA Check}
+\subsubsection{Description}
+ The software will read in, determine, and output the minimum Cross Sectional Area (CSA) of a wire through its entire run in the wire harness.
+\subsubsection{Priority}
+Low (Phase 2).
+
+\subsubsection{Stimulus and Response}
+The Cross Sectional Area of a wire is specified in the input and tracked to the output.
+
+\subsubsection{Functional Requirements}
+The system shall find the minimum wire CSA from the start point to the end point of the wire.
+
+  \subsection{Wire Overheating Check}
+\subsubsection{Description}
+The system shall cross-check the fuse rating of the wire with the wire CSA to determine if it could overheat.
+
+\subsubsection{Priority}
+Low (Phase 2).
+
+\subsubsection{Stimulus and Response}
+Wire CSA and fuse rating are part of the input document(s). A percentage of the fuse rating threshold is specified. Wires are flagged in the output document with indication that they could be subject to overheat.
+
+\subsubsection{Functional Requirements}
+The software shall determine whether wires are subject to overheating determined by a user-supplied fuse rating threshold and minumum wire CSA.
+
+
+
+
+ 
+ 
