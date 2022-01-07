@@ -1,19 +1,17 @@
 \section{Overall Description}
 
-
-
 \subsection{Product Perspective}
  The application is intended to make PACCAR employees' validation strategy less time consuming. By creating a streamlined output for each wire as well as computing automated validation checks, it can deliver more helpful information to employees when troubleshooting schematics. This will decrease the time it takes employees to find the source of error and increase productivity as a whole. Less time troubleshooting means more time spent elsewhere.
 
 \subsection{Product Features}
- The application will be able to read in .xlsx and .csv spreadsheets representing wiring diagrams, and parse this information. A graphical interface will be implemented to allow users to select input files and designate which columns contain the needed information. The application will be able to export a human-readable summary of relevant information as a .pdf or a .xlsx spreadsheet. This summary will denote any wires which present a risk of overheating due to a mismatch between wire gauge and fuse rating. 
+ The application will be able to read in .xlsx and .csv spreadsheets representing wiring diagrams, and parse this information. A graphical interface will be implemented to allow users to select input files and designate which columns contain the needed information. The application will be able to export a human-readable summary of relevant information as an .xlsx spreadsheet. This summary will denote any wires which present a risk of overheating due to a mismatch between wire gauge and fuse rating.
 
 \subsection{User Classes and Characteristics}
-  The product shall be developed for two user classes. The first will be a PACCAR employee. This user will provide excel sheets of wire reports and the PDC Fuse map and the program will output the newly organized data into a new excel spreadsheet that includes any potential errors in the input. The user may customize the output in a limited capacity such as set column names. The next user class will be the developer. Our program will include a developer mode that will provide an efficient way to test outputs for wire reports and output helpful information to the screen for debugging.  
+  The product shall be developed for two user classes. The first will be a PACCAR employee. This user will provide excel sheets of wire reports and the PDC Fuse map and the program will output the newly organized data into a new excel spreadsheet that includes any potential errors in the input. The user may customize the output in a limited capacity such as set column names. The next user class will be the developer. The program will include a developer mode that will provide an efficient way to test outputs for wire reports and output helpful information to the screen for debugging.
 
 \subsection{Operating Environment}
 
-The operating environment for the application shall be a desktop application for Windows operating system in an office environment. The program shall be written in Python using the Qt framework for developing graphical user interfaces. The program shall be simple enough to use for even non tech savvy users with minimal instruction.
+The operating environment for the application shall be a desktop application for the Windows 10 operating system in an office environment. The program shall be written in Python using the Qt framework for developing graphical user interfaces. The program shall be simple enough to use for even non tech savvy users with minimal instruction.
 
 \subsection{Design and Implementation Constraints}
 The team aims to deliver a wiring validation tool for PACCAR employees. As the main users, employees require a windows application to assist them in the validation process of creating wiring diagrams. Employees have requested that our application can be used with a single hand, and that we implement colorblind support where necessary. The application will include documentation to instruct users in its usage. 
