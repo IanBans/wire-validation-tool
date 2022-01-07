@@ -11,9 +11,20 @@ High
  A user selects the documents from their hard drive through the file picker. The software will read the documents and write the results to a separate file
 
 \subsubsection{Functional Requirements}
+
+\begin{enumerate}
+
+
  
- The software shall read data from the selected .xlsx/csv documents when selected
+\item  The software shall read data from the selected .xlsx documents when selected
  and write output data to an .xlsx document upon completion.
+
+ \item The software shall read from .xlsx documents the columns "From Component: Name" "From Component: Label", "To Component" "To Pin/Cavity" "Wire CSA"
+
+ \item The software shall read from .csv documents the columns "Connector" "Pin", "Fuse Rating". for feature 3.3.
+
+ \item The software shall write to .xlsx documents the columns "Circuit Label" "End Pin", "Start Pin" "Lowest Wire CSA", "Fuse Rating"
+ \end{enumerate}
  
  \subsection{Splice Handling}
 \subsubsection{Description}
@@ -25,7 +36,7 @@ High
 When a spliced wire is detected in the input, the software shall show each output of the splice in a separate row in the output Excel document.
 
 \subsubsection{Functional Requirements}
- The software shall display the outputs of wire splices in separate rows of the output.
+ The software shall display a separate row of output for each output of a wire splice
  
   \subsection{Output Columns}
 \subsubsection{Description}
@@ -38,21 +49,21 @@ High
 The software reads this information from the inputted documents and compiles the information about each wire into an output document  as specified in requirement 3.3
 
 \subsubsection{Functional Requirements}
- The software shall compile the above information into one output document.
+ The software shall compile the above information into one Excel output document. Each wire connection will be a separate row in the document.
  
 \subsection{Build to Windows}
 \subsubsection{Description}
- The software will build to and run on a Windows PC
+ The software will build to and run on a Windows 10 PC
 \subsubsection{Priority}
 High
 \subsubsection{Stimulus and Response}
-The software is operational on the Windows operating system
+The software is operational on the Windows 10 operating system
 \subsubsection{Functional Requirements}
-The software shall be installable upon, and run on a Windows P.C.
+The software shall be installable upon, and run on a Windows P.C running Windows 10.
 
   \subsection{Graphical User Interface}
 \subsubsection{Description}
- The software will display a Graphical User Interface (GUI) that allows users to pick files, modify parameters, and see status of processing. 
+ The software will display a Graphical User Interface (GUI) that allows users to pick files, modify parameters, and see status of processing.
 \subsubsection{Priority}
 Medium.
 
@@ -60,11 +71,11 @@ Medium.
 The software responds to user input and displays data through a graphical interface.
 
 \subsubsection{Functional Requirements}
-The software shall display a GUI that allows users to pick the input files and output location, specify names of columns to include, and show processing status
+The software shall display a GUI that allows users to pick the input files and output location, specify names of columns for input, and show processing status.
  
   \subsection{Minimum Wire CSA Check}
 \subsubsection{Description}
- The software will read in, determine, and output the minimum Cross Sectional Area (CSA) of a wire through its entire run in the wire harness.
+ The software will read, determine, and output the minimum Cross Sectional Area (CSA) of a wire through its entire run in the wire harness.
 \subsubsection{Priority}
 Low (Phase 2).
 
@@ -72,7 +83,14 @@ Low (Phase 2).
 The Cross Sectional Area of a wire is specified in the input and tracked to the output.
 
 \subsubsection{Functional Requirements}
-The system shall find the minimum wire CSA from the start point to the end point of the wire.
+\begin{enumerate}
+ \item The software shall determine the minimum wire CSA from the start point to the end point of the wire.
+ \item The software will record this information in a column of the output .xlsx document
+\end{enumerate}
+
+
+
+
 
   \subsection{Wire Overheating Check}
 \subsubsection{Description}
@@ -85,9 +103,15 @@ Low (Phase 2).
 Wire CSA and fuse rating are part of the input document(s). A percentage of the fuse rating threshold is specified. Wires are flagged in the output document with indication that they could be subject to overheat.
 
 \subsubsection{Functional Requirements}
-The software shall determine whether wires are subject to overheating determined by a user-supplied fuse rating threshold and minumum wire CSA.
+\begin{enumerate}
 
 
+\item The software shall determine whether wires are subject to overheating determined by a user-supplied fuse rating threshold and minumum wire CSA.
+\item The software shall read wire size information from a .csv file with columns "Ampere Range" and "Wire CSA"
+
+\item The software shall add a column to the ouput .xlsx document labeled "Overheat" showing whether wire CSA is within range of the provided .csv for the maximum fuse amperage
+
+\end{enumerate}
 
 
  
