@@ -31,43 +31,48 @@ class App(QMainWindow):
         self.pick_excel.clicked.connect(self.openExcelFileDialog)
 
 
-
+    #opens the file dialog for picking CSV files
     def openCSVFileDialog(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self,"Choose file", Path.home().as_posix(),"CSV Files (*.csv)", options=options)
-        self.pdcGraph = Graph()
-        self.pdcGraph["name"] = "PDC"
-        if fileName:
-            self.csv_path.setText(fileName)
-            with open(fileName, mode='r') as csv_file:
-                fusemap = csv.DictReader(csv_file, delimiter=',')
-                for line in fusemap:
-                    print(line)
-                    self.pdcGraph.add_vertices(3, line)
+        csvFileName, _ = QFileDialog.getOpenFileName(self,"Choose file", Path.home().as_posix(),"CSV Files (*.csv)", options=options)
+        self.readPDC(csvFileName)
 
-                print(self.pdcGraph)
+    #Reads the PDC fuse map CSV and returns a list of the dictionaries
+    #Each element in the list is a row of the PDC file, in dict format
+    def readPDC(self, fileName):
+        if fileName:
+            #Sets the GUI path
+            self.csv_path.setText(fileName)
+            #reads the PDC from the supplied file
+            with open(fileName, mode='r') as csv_file:
+                pdcDict = csv.DictReader(csv_file, delimiter=',')
+                #print(list(pdcDict))
+                print("Successfully opened pdc fuse map..")
+                return list(pdcDict)
+        else:
+            print("invalid filename passed to readPDC")
 
 
 
     def openExcelFileDialog(self):
-
-        def wire_pin_convert(lst):
-            for i in range(0, len(lst), 2):
-                res_dct = {COMPONENT: lst[i], PIN: lst[i+1], FUSE_RATING: 0}
-            return res_dct
-
-
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Choose file", Path.home().as_posix(),"Excel Files (*.xlsx)", options=options)
+        self.readWireMap(self.fileName)
+
+    def readWireMap(self, fileName):
+        def wire_pin_convert(lst):
+            for i in range(0, len(lst), 2):
+                res_dct = {COMPONENT: lst[i], PIN: lst[i+1], FUSE_RATING: 0}
+            return res_dict
+
         if fileName:
             self.excel_path.setText(fileName)
             wb = load_workbook(filename=fileName)
             sheet = wb.active
             for col in sheet.iter_cols(min_col=3, max_col=6, min_row=1, max_row=sheet.max_row, values_only=True):
                 print(wire_pin_convert(col))
-
 
 
     def openFileNamesDialog(self):
