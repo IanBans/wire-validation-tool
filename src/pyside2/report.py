@@ -11,7 +11,7 @@ from openpyxl import Workbook, load_workbook
 '''
 class Report:
 
-    def __init__(self, filename, from_labels=(), to_labels=(), csa="", desc=""):
+    def __init__(self, filename, from_labels, to_labels, csa, desc):
         self.filename = filename
         self.to_labels = to_labels
         self.from_labels = from_labels
@@ -19,6 +19,7 @@ class Report:
         self.desc = desc
         self.sheet_list = []
         print(self.filename)
+        self.read()
 
     def read(self):
 
@@ -31,22 +32,24 @@ class Report:
                 num = num + 1
             return names
 
+
         if self.filename:
             wb = load_workbook(filename=self.filename)
             sheet = wb.active
             column_map = mapColumnNames(sheet)
             try:
-                for rows in sheet.iter_rows(2, sheet.max_row, values_only=True):
+                for row in sheet.iter_rows(2, sheet.max_row, values_only=True):
                     dict = {}
-                    dict["FCOMP"] = rows[column_map[self.from_labels[0]]]
-                    dict["FPIN"] = rows[column_map[self.from_labels[1]]]
-                    dict["TCOMP"] = rows[column_map[self.to_labels[0]]]
-                    dict["TPIN"] = rows[column_map[self.to_labels[1]]]
-                    dict["CSA"] = rows[column_map[self.csa]]
-                    dict["DESC"] = rows[column_map[self.desc]]
-                    self.sheet_list.append(dict)
+                    if(row[0] != None):
+                        dict["FCOMP"] = row[column_map[self.from_labels[0]]]
+                        dict["FPIN"] = row[column_map[self.from_labels[1]]]
+                        dict["TCOMP"] = row[column_map[self.to_labels[0]]]
+                        dict["TPIN"] = row[column_map[self.to_labels[1]]]
+                        dict["CSA"] = row[column_map[self.csa]]
+                        dict["DESC"] = row[column_map[self.desc]]
+                        self.sheet_list.append(dict)
                 return self.sheet_list
             except KeyError as e:
-                print("check column name " + str(e) + " matches file")
+                print("check column label " + str(e) + " matches file")
         else:
             print("bad filename in Report.read")
