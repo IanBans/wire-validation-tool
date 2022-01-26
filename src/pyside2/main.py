@@ -1,6 +1,7 @@
-import sys, openpyxl, csv, os
+import sys, openpyxl, os, inputparser
 from igraph import *
 from pathlib import Path
+from inputparser import InputParser
 from PySide2 import QtWidgets, QtUiTools
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import *
@@ -16,6 +17,7 @@ class App(QMainWindow):
         ui_file.open(QFile.ReadOnly)
         loader = QUiLoader()
         self.window = loader.load(ui_file)
+        self.parser = InputParser()
         ui_file.close()
         self.setup_ui()
         self.window.show()
@@ -36,37 +38,20 @@ class App(QMainWindow):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Choose file", Path.home().as_posix(),"CSV Files (*.csv)", options=options)
-        self.pdcGraph = Graph()
-        self.pdcGraph["name"] = "PDC"
-        if fileName:
-            self.csv_path.setText(fileName)
-            with open(fileName, mode='r') as csv_file:
-                fusemap = csv.DictReader(csv_file, delimiter=',')
-                for line in fusemap:
-                    print(line)
-                    self.pdcGraph.add_vertices(3, line)
+        self.csv_path.setText(fileName)
+        pdc_data = self.parser.readPDC(fileName)
 
-                print(self.pdcGraph)
+
 
 
 
     def openExcelFileDialog(self):
-
-        def wire_pin_convert(lst):
-            for i in range(0, len(lst), 2):
-                res_dct = {COMPONENT: lst[i], PIN: lst[i+1], FUSE_RATING: 0}
-            return res_dct
-
-
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Choose file", Path.home().as_posix(),"Excel Files (*.xlsx)", options=options)
-        if fileName:
-            self.excel_path.setText(fileName)
-            wb = load_workbook(filename=fileName)
-            sheet = wb.active
-            for col in sheet.iter_cols(min_col=3, max_col=6, min_row=1, max_row=sheet.max_row, values_only=True):
-                print(wire_pin_convert(col))
+        self.excel_path.setText(fileName)
+        if "chass.xlsx" in fileName:
+            chass_data = self.parser.readReport(fileName, ("TO", "T_TERM"), ("FROM", "F_TERM"), "WIRE CSA", "DESCRIPTION")
 
 
 
