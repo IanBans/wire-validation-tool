@@ -56,6 +56,7 @@ def create_graph():
 
 def find_splices(g, i, tracking_list):
     if(i in tracking_list):
+        print("loop detected starting at ", i)
         return
     tracking_list.append(i)
     neighbors = g.neighbors(i, mode="out")
