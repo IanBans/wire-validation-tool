@@ -138,34 +138,27 @@ class App(QMainWindow):
         def change_wire_report(index):
             fields_selector.setCurrentIndex(index.row())
 
-        def update_model(combo_box, child, field):
-            item = self.model.item(0, child)
-            child_item = QStandardItem()
-            child_item.setText(combo_box.currentText())
-            item.setChild(0, field, child_item)
-            print(item.child(0, field).text())
+        #prints all column fields for all wire reports
+        def print_dict():
 
-        def print_model():
-            for col in range(self.model.columnCount()):
-                item = self.model.item(0, col)
-                #for x in range(item.columnCount()):
-                print(item.child(0, 9))
+            print("num of reports " + str(num_wire_reports))
+            for path, combo_list in combo_box_dict.items():
+                print(path)
+                for box in combo_list:
+                    print(box.currentText())
 
+
+        #create a new dictionary from combobox_dict where it is populated by strings instead of combobox objects
+        def make_dict():
+            for key, value in combo_box_dict.items():
+                list = []
+                for box in value:
+                    list.append(box.currentText())
+                self.wire_report_dict.update({key : list})
 
         self.wire_report_list.itemClicked.connect(lambda: change_wire_report(self.wire_report_list.currentIndex()))
         num_wire_reports = len(self.wire_report_paths)
         fields_list = ["Select Option", "From", "Wire", "Pin", "Stuff"]
-
-        #create a model to record column fields. THe model is a table 1 row by num of wire reports. it its pupulated by items who are lists themselves
-        self.model = QStandardItemModel(1, num_wire_reports)
-        for col in range(self.model.columnCount()):
-            item = QStandardItem(0, col)
-            item.setText("wire_report_" + str(col))
-            item.setRowCount(1)
-            item.setColumnCount(10)
-            self.model.setItem(0, col, item)
-
-
 
 
         page = QWidget()
@@ -181,43 +174,40 @@ class App(QMainWindow):
         page_layout.addWidget(fields_selector, 0, 1)
 
 
-        #create drop down boxes and link them to model
-        box_array = []
-        for wire_report in range(num_wire_reports):
-            combo_list = []
-            box_array.append(combo_list)
+        #the Dictionary that contains all the wire columnn fields. The key is the wire path and the value is a list of QComboBoxes thatt contain wire fields
+        combo_box_dict = {}
+        #the real dictionary that has the same data as the abovve dict but stores the data as a list of strings instead of a list of QWidgets
+        self.wire_report_dict = {}
 
+
+        #create comboxes and add them to page
         for wire_report in range(num_wire_reports):
 
             fields_layout = QFormLayout()
             fields_container = QWidget()
             fields_container.setLayout(fields_layout)
+            combo_box_list = []
+            combo_box_dict.update({self.wire_report_paths[wire_report] : combo_box_list})
 
             for i in range(10):
                 combo_box = QComboBox()
                 for field in fields_list:
                     combo_box.addItem(field)
-                #combo_box.currentIndexChanged.connect(lambda: update_model(combo_box, wire_report, i))
+
                 label = QLabel("Column Field " + str(i))
+                combo_box_list.append(combo_box)
                 combo_box.setCurrentIndex(0)
                 fields_layout.addRow(combo_box, label)
-                box_array[wire_report].append(combo_box)
-                #connect combo box
+
             fields_selector.addWidget(fields_container)
 
         fields_selector.setCurrentIndex(0)
 
-        for i in range(len(box_array)):
-            for j in range(i):
-                j.currentIndexChanged.connect(lambda: update_model(box_array[i][j], i, j))
 
         submit = QPushButton("Submit")
         page_layout.addWidget(submit, 2, 0)
-        submit.clicked.connect(print_model)
-
-
-
-
+        submit.clicked.connect(print_dict)
+        submit.clicked.connect(make_dict)
 
 
 
