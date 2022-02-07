@@ -13,20 +13,17 @@ class App(QMainWindow):
     #load the ui file and find the elements
     def __init__(self, ui_filename):
         super().__init__()
-        ui_file = QFile(ui_filename)
-        ui_file.open(QFile.ReadOnly)
-        loader = QUiLoader()
+        #took out the part where we read gui elements from csv
+        #ui_file = QFile(ui_filename)
+        #ui_file.open(QFile.ReadOnly)
+        #loader = QUiLoader()
         #self.window = loader.load(ui_file)
         self.parser = InputParser()
 
-        #stacked widget where each widget shows its own page
 
-
-
-
-
-        ui_file.close()
+        #ui_file.close()
         self.setup_ui()
+
     def setup_ui(self):
         #stacked widget is the container that can be swapped out to change pages
         self.stacked_widget = QStackedWidget()
@@ -56,16 +53,16 @@ class App(QMainWindow):
         #Qwidget that contains paths of all wire Reports
         self.wire_report_list = QListWidget()
 
-        self.file_page()
+        self.settup_file_page()
 
-    #pages sor far: "front", "file_picker", "wire_reports"
+    #pages so far: "front", "file_picker", "wire_reports"
     def goto_page(self, target):
 
         if target in self.pages:
             self.stacked_widget.setCurrentWidget(self.pages[target])
 
     #settup for picking all wire reports and PDC
-    def file_page(self):
+    def settup_file_page(self):
 
         def add_wire_report():
             next_wire_report_button = QPushButton("Choose Wire Report")
@@ -83,8 +80,7 @@ class App(QMainWindow):
 
             self.right_widget_layout.insertRow(self.right_widget_layout.rowCount() - 1, next_PDC_button)
 
-        #def change_wire_button_text(button, new_text):
-            #button.setText(new_text)
+
 
         self.wire_report_paths = []
 
@@ -126,6 +122,7 @@ class App(QMainWindow):
         self.pages.update({"file_picker": self.file_picker_widgets})
 
         #button to next page
+        #the next button is also the trigger to set up the next page since it relies on data collected from this current page
         next_button = QPushButton("Next")
         next_button.clicked.connect(self.setup_wire_reports)
         next_button.clicked.connect(lambda: self.goto_page("wire_reports"))
@@ -158,6 +155,8 @@ class App(QMainWindow):
 
         self.wire_report_list.itemClicked.connect(lambda: change_wire_report(self.wire_report_list.currentIndex()))
         num_wire_reports = len(self.wire_report_paths)
+
+        #this list contains all the column fields names. Currently just a place holder list. first option needs to be junk option
         fields_list = ["Select Option", "From", "Wire", "Pin", "Stuff"]
 
 
@@ -176,11 +175,11 @@ class App(QMainWindow):
 
         #the Dictionary that contains all the wire columnn fields. The key is the wire path and the value is a list of QComboBoxes thatt contain wire fields
         combo_box_dict = {}
-        #the real dictionary that has the same data as the abovve dict but stores the data as a list of strings instead of a list of QWidgets
+        #the real dictionary that has the same data as the above dict but stores the data as a list of strings instead of a list of QWidgets
         self.wire_report_dict = {}
 
 
-        #create comboxes and add them to page
+        #create combo boxes and add them to page
         for wire_report in range(num_wire_reports):
 
             fields_layout = QFormLayout()
@@ -216,7 +215,7 @@ class App(QMainWindow):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Choose file", Path.home().as_posix(),"CSV Files (*.csv)", options=options)
-        self.csv_path.setText(fileName)
+        self.pdc_paths.append(fileName)
         pdc_data = self.parser.readPDC(fileName)
 
 
