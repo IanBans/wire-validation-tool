@@ -10,18 +10,10 @@ from PySide2.QtCore import QRect, QFile, QIODevice, QObject
 from openpyxl import Workbook, load_workbook
 
 class App(QMainWindow):
-    #load the ui file and find the elements
-    def __init__(self, ui_filename):
+    # setup UI and create parser
+    def __init__(self):
         super().__init__()
-        #took out the part where we read gui elements from csv
-        #ui_file = QFile(ui_filename)
-        #ui_file.open(QFile.ReadOnly)
-        #loader = QUiLoader()
-        #self.window = loader.load(ui_file)
         self.parser = InputParser()
-
-
-        #ui_file.close()
         self.setup_ui()
 
     def setup_ui(self):
@@ -229,8 +221,6 @@ class App(QMainWindow):
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Choose file", Path.home().as_posix(),"CSV Files (*.csv)", options=options)
         self.pdc_paths.append(fileName)
-        pdc_data = self.parser.readPDC(fileName)
-
         if fileName:
             button.setText(fileName)
 
@@ -244,9 +234,6 @@ class App(QMainWindow):
         #sace data for gui to use later
         self.wire_report_paths.append(fileName)
         self.wire_report_list.addItem(fileName)
-        if "chass.xlsx" in fileName:
-            chass_data = self.parser.readReport(fileName, ("TO", "T_TERM"), ("FROM", "F_TERM"), "WIRE CSA", "DESCRIPTION")
-
         if fileName:
             button.setText(fileName)
 
@@ -269,5 +256,5 @@ class App(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = App("basic_input.ui")
+    window = App()
     sys.exit(app.exec_())
