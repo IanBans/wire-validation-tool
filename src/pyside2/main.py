@@ -143,6 +143,10 @@ class App(QMainWindow):
                 for box in combo_list:
                     print(box.currentText())
 
+        #send files to input parser
+        for path in self.pdc_paths:
+            self.parser.readPDC(path)
+
 
         #create a new dictionary from combobox_dict where it is populated by strings instead of combobox objects
         def make_dict():
@@ -151,12 +155,19 @@ class App(QMainWindow):
                 for box in value:
                     list.append(box.currentText())
                 self.wire_report_dict.update({key : list})
+        #send reports to input Parser
+        def send_reports():
+            for path, fields in self.wire_report_dict.items():
+                from_tuple = (fields[0], fields[1])
+                to_tuple = (fields[2], fields[3])
+                self.parser.readReport(path, from_tuple, to_tuple, fields[4], fields[5])
+
 
         self.wire_report_list.itemClicked.connect(lambda: change_wire_report(self.wire_report_list.currentIndex()))
         num_wire_reports = len(self.wire_report_paths)
 
-        #this list contains all the column fields names. Currently just a place holder list. first option needs to be junk option
-        fields_list = ["Select Option", "From", "Wire", "Pin", "Stuff"]
+        #this list contains all the column fields names.
+        fields_list = ["From Component", "From Pin",  "To Component", "To Pin", "Wire CSA", "Description"]
 
 
         page = QWidget()
@@ -179,20 +190,22 @@ class App(QMainWindow):
 
 
         #create combo boxes and add them to page
-        for wire_report in range(num_wire_reports):
+        for wire_report in self.wire_report_paths:
 
             fields_layout = QFormLayout()
             fields_container = QWidget()
             fields_container.setLayout(fields_layout)
             combo_box_list = []
-            combo_box_dict.update({self.wire_report_paths[wire_report] : combo_box_list})
+            combo_box_dict.update({wire_report : combo_box_list})
+            column_names = self.parser.readColumnNames(wire_report)
 
-            for i in range(10):
+            for i in range(len(fields_list)):
                 combo_box = QComboBox()
-                for field in fields_list:
-                    combo_box.addItem(field)
+                combo_box.addItem("Choose Option")
+                for name in column_names:
+                    combo_box.addItem(name)
 
-                label = QLabel("Column Field " + str(i))
+                label = QLabel(fields_list[i])
                 combo_box_list.append(combo_box)
                 combo_box.setCurrentIndex(0)
                 fields_layout.addRow(combo_box, label)
@@ -204,8 +217,9 @@ class App(QMainWindow):
 
         submit = QPushButton("Submit")
         page_layout.addWidget(submit, 2, 0)
-        submit.clicked.connect(print_dict)
+        #submit.clicked.connect(print_dict)
         submit.clicked.connect(make_dict)
+        submit.clicked.connect(send_reports)
 
 
 
