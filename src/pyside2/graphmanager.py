@@ -57,7 +57,7 @@ class GraphManager:
             ecsa = row["CSA"]
 
             #get vertex information
-            fconn = f_tup[0]
+            fconn = str(f_tup[0])
             fpin = str(f_tup[1])
             fname = fconn + "|" + fpin
             tconn = str(t_tup[0])
@@ -72,18 +72,19 @@ class GraphManager:
             if len(self.g.vs.select(name=tname)) == 0:
                 self.g.add_vertex(name=tname, connector=tconn, pin=tpin, fuse_rating=0.0)
 
-            #create edge
-            self.g.add_edge(fname, tname, wire=desc, csa=ecsa)
+            #create edge between from and to with csa, if not NoneType
+            if("None" not in fname and "None" not in tname):
+                self.g.add_edge(fname, tname, wire=desc, csa=ecsa)
 
         print('added ', report.filename, ' to graph')
 
-    def find_splices(self, i, tracking_list):
+    def find_splices(self, i=0, tracking_list=[]):
         if(i in tracking_list):
             print("loop detected starting at ", i)
             return
         tracking_list.append(i)
         neighbors = self.g.neighbors(i, mode="out")
-        
+
         if len(neighbors) > 1:
             print("splice with ", i, "to ", neighbors)
             for x in neighbors:
