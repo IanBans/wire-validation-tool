@@ -38,9 +38,8 @@ class InputParser:
         else:
             print("invalid filename passed to readPDC...")
 
-    #Creates a report object with #filename, (to_conn)
-    #reads the report,
-    #stores the object, and returns the data
+    #Creates a report object from filename, (from_conn, from_pin), (to_conn, to_pin), csa, description
+    #reads the report, stores the object, and returns the data
     def readReport(self, filename, from_labels, to_labels, csa, desc):
         report = Report(filename, from_labels, to_labels, csa, desc)
         self.reports.append(report)
@@ -50,7 +49,7 @@ class InputParser:
     def getReports(self):
         return self.reports
 
-      
+
     #gets first line of worksheet 'filename'
     #and returns it as a list
     def readColumnNames(self, filename):

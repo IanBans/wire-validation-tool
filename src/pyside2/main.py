@@ -1,7 +1,7 @@
-import sys, openpyxl, os, inputparser
-from igraph import *
+import sys, openpyxl, os, inputparser, igraph
 from pathlib import Path
 from inputparser import InputParser
+from graphmanager import *
 from PySide2 import QtWidgets, QtUiTools
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import *
@@ -14,6 +14,8 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.parser = InputParser()
+        self.graph = GraphManager()
+        self.wire_graph = self.graph.g
         self.setup_ui()
 
     def setup_ui(self):
@@ -62,9 +64,7 @@ class App(QMainWindow):
         def add_wire_report():
             next_wire_report_button = QPushButton("Choose Wire Report")
             next_wire_report_button.clicked.connect(lambda : self.openExcelFileDialog(next_wire_report_button))
-
             path_label = QLabel("File Path")
-
             left_widget_layout.insertRow(left_widget_layout.rowCount() - 1, next_wire_report_button)
 
 
@@ -153,6 +153,11 @@ class App(QMainWindow):
                 from_tuple = (fields[0], fields[1])
                 to_tuple = (fields[2], fields[3])
                 self.parser.readReport(path, from_tuple, to_tuple, fields[4], fields[5])
+                for pdc in self.parser.pdcs.values():
+                    self.graph.add_pdc(pdc)
+                for report in self.parser.reports:
+                    self.graph.add_report(report)
+                print(self.graph.g)
 
 
         self.wire_report_list.itemClicked.connect(lambda: change_wire_report(self.wire_report_list.currentIndex()))
@@ -213,9 +218,6 @@ class App(QMainWindow):
         submit.clicked.connect(make_dict)
         submit.clicked.connect(send_reports)
 
-
-
-
     def openCSVFileDialog(self, button):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
@@ -236,8 +238,6 @@ class App(QMainWindow):
         self.wire_report_list.addItem(fileName)
         if fileName:
             button.setText(fileName)
-
-
 
     def openFileNamesDialog(self):
         options = QFileDialog.Options()
