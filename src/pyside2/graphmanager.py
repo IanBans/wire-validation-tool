@@ -63,8 +63,6 @@ class GraphManager:
             tconn = str(t_tup[0])
             tpin = str(t_tup[1])
             tname = tconn + "|" + tpin
-            print(fname)
-            print(tname)
 
             #create vertices that don't exist
             if len(self.g.vs) == 0:
