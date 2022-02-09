@@ -74,4 +74,20 @@ class GraphManager:
 
             #create edge
             self.g.add_edge(fname, tname, wire=desc, csa=ecsa)
+
         print('added ', report.filename, ' to graph')
+
+    def find_splices(self, i, tracking_list):
+        if(i in tracking_list):
+            print("loop detected starting at ", i)
+            return
+        tracking_list.append(i)
+        neighbors = self.g.neighbors(i, mode="out")
+        
+        if len(neighbors) > 1:
+            print("splice with ", i, "to ", neighbors)
+            for x in neighbors:
+                self.find_splices(x, tracking_list)
+        elif len(neighbors) == 1:
+            print(neighbors)
+            self.find_splices(neighbors[0], tracking_list)
