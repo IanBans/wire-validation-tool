@@ -1,5 +1,6 @@
 import csv, os
 from report import Report
+from openpyxl import Workbook, load_workbook
 
 '''
    InputParser: Functions to parse input
@@ -48,3 +49,15 @@ class InputParser:
     #get the current list of report objects
     def getReports(self):
         return self.reports
+
+      
+    #gets first line of worksheet 'filename'
+    #and returns it as a list
+    def readColumnNames(self, filename):
+        if filename:
+            wb = load_workbook(filename)
+            sheet = wb.active
+            names = []
+            for col in sheet.iter_cols(1, sheet.max_column, 1, 1, True):
+                names.append(col[0])
+            return names
