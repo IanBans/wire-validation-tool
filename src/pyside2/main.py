@@ -145,7 +145,8 @@ class App(QMainWindow):
 
         #send files to input parser
         for path in self.pdc_paths:
-            self.parser.readPDC(path)
+            if path:
+                self.parser.readPDC(path)
 
 
         #create a new dictionary from combobox_dict where it is populated by strings instead of combobox objects
@@ -229,7 +230,7 @@ class App(QMainWindow):
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Choose file", Path.home().as_posix(),"CSV Files (*.csv)", options=options)
         self.pdc_paths.append(fileName)
-        pdc_data = self.parser.readPDC(fileName)
+        #pdc_data = self.parser.readPDC(fileName)
 
         if fileName:
             button.setText(fileName)
