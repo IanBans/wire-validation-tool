@@ -8,7 +8,7 @@ from openpyxl import Workbook, load_workbook
    toLabels: a tuple of strings containing the column labels of TO (component, pin)
    fromLabels: a tuple of strings containing the column labels of FROM (component, pin)
    sheet_list: a list output of the report contents in
-    {FCOMP, FPIN, TCOMP, TPIN, CSA, DESC} dictionary format
+    {FROM: (component, pin), TO: (component, pin) CSA, DESC} dictionary format
 '''
 class Report:
 
@@ -21,6 +21,9 @@ class Report:
         self.desc = desc
         self.sheet_list = []
         self.read()
+
+    def getContents(self):
+        return self.sheet_list
 
     def read(self):
 
@@ -41,12 +44,10 @@ class Report:
             try:
                 for row in sheet.iter_rows(2, sheet.max_row, values_only=True):
                     dict = {}
-                    
+
                     if(row[0] != None):
-                        dict["FCOMP"] = row[column_map[self.from_labels[0]]]
-                        dict["FPIN"] = row[column_map[self.from_labels[1]]]
-                        dict["TCOMP"] = row[column_map[self.to_labels[0]]]
-                        dict["TPIN"] = row[column_map[self.to_labels[1]]]
+                        dict["FROM"] = (row[column_map[self.from_labels[0]]], row[column_map[self.from_labels[1]]])
+                        dict["TO"] = (row[column_map[self.to_labels[0]]], row[column_map[self.to_labels[1]]])
                         dict["CSA"] = row[column_map[self.csa]]
                         dict["DESC"] = row[column_map[self.desc]]
                         self.sheet_list.append(dict)
