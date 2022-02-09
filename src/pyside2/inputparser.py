@@ -37,13 +37,13 @@ class InputParser:
         else:
             print("invalid filename passed to readPDC...")
 
-    #Creates a report object,
+    #Creates a report object with #filename, (to_conn)
     #reads the report,
     #stores the object, and returns the data
     def readReport(self, filename, from_labels, to_labels, csa, desc):
         report = Report(filename, from_labels, to_labels, csa, desc)
         self.reports.append(report)
-        return report.sheet_list
+        return report
 
     #get the current list of report objects
     def getReports(self):

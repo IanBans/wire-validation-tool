@@ -22,6 +22,9 @@ class Report:
         self.sheet_list = []
         self.read()
 
+    def getContents(self):
+        return self.sheet_list
+
     def read(self):
 
         #maps column names to column numbers for identification
