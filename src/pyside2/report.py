@@ -30,27 +30,29 @@ class Report:
         #maps column names to column numbers for identification
         def mapColumnNames(report):
             names = {}
-            num = 0
-            for col in report.iter_cols(1, report.max_column, 1, 1, True):
-                names[col[0]] = num
-                num = num + 1
+            for first_row in report.iter_rows(1, 1, 1, sheet.max_column, True):
+                row = first_row
+            for num in range(0, sheet.max_column):
+                    names[row[num]] = num
             return names
 
 
         if self.filepath:
-            wb = load_workbook(self.filepath)
+            wb = load_workbook(self.filepath, read_only=True)
             sheet = wb.active
             column_map = mapColumnNames(sheet)
             try:
                 for row in sheet.iter_rows(2, sheet.max_row, values_only=True):
                     dict = {}
+                    row_list = list(row)
 
-                    if(row[0] != None):
+                    if(row_list != [None]*sheet.max_column):
                         dict["FROM"] = (row[column_map[self.from_labels[0]]], row[column_map[self.from_labels[1]]])
                         dict["TO"] = (row[column_map[self.to_labels[0]]], row[column_map[self.to_labels[1]]])
                         dict["CSA"] = row[column_map[self.csa]]
                         dict["DESC"] = row[column_map[self.desc]]
                         self.sheet_list.append(dict)
+                        print(dict)
                 print("successfully read report: ", self.filename)
                 return self.sheet_list
             except KeyError as e:

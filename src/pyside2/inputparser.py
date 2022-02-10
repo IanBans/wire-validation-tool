@@ -54,9 +54,10 @@ class InputParser:
     #and returns it as a list
     def readColumnNames(self, filename):
         if filename:
-            wb = load_workbook(filename)
+            wb = load_workbook(filename, read_only=True)
             sheet = wb.active
             names = []
-            for col in sheet.iter_cols(1, sheet.max_column, 1, 1, True):
-                names.append(col[0])
+            for first_row in sheet.iter_rows(1, 1, 1, sheet.max_column, True):
+                names = list(first_row)
+
             return names
