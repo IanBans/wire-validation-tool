@@ -12,7 +12,7 @@ from openpyxl import Workbook, load_workbook
 '''
 class Report:
 
-    def __init__(self, filepath, from_labels, to_labels, csa="WIRE CSA", desc="DESCRIPTION"):
+    def __init__(self, filepath, from_labels, to_labels, csa, desc):
         self.filepath = filepath
         self.filename = os.path.basename(filepath)
         self.to_labels = to_labels
@@ -22,9 +22,12 @@ class Report:
         self.sheet_list = []
         self.read()
 
+
     def getContents(self):
         return self.sheet_list
 
+    #reads the report from filepath and stores output in sheet_list, or empty list if
+    #reading unsuccessful
     def read(self):
 
         #maps column names to column numbers for identification
@@ -41,21 +44,23 @@ class Report:
             wb = load_workbook(self.filepath, read_only=True)
             sheet = wb.active
             column_map = mapColumnNames(sheet)
+            #creates a list of NoneType to check for empty rows
+            empty = [None]*sheet.max_column
             try:
                 for row in sheet.iter_rows(2, sheet.max_row, values_only=True):
                     dict = {}
                     row_list = list(row)
-
-                    if(row_list != [None]*sheet.max_column):
+                    #if row is empty, don't process it
+                    if(row_list != empty):
                         dict["FROM"] = (row[column_map[self.from_labels[0]]], row[column_map[self.from_labels[1]]])
                         dict["TO"] = (row[column_map[self.to_labels[0]]], row[column_map[self.to_labels[1]]])
                         dict["CSA"] = row[column_map[self.csa]]
                         dict["DESC"] = row[column_map[self.desc]]
                         self.sheet_list.append(dict)
-                        print(dict)
                 print("successfully read report: ", self.filename)
                 return self.sheet_list
             except KeyError as e:
                 print("check column label " + str(e) + " matches file")
+                return []
         else:
             print("bad filename in Report.read")

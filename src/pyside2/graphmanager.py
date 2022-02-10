@@ -6,17 +6,13 @@ class GraphManager:
 
     def __init__(self):
         self.g = Graph()
-        self.g.add_vertex(name="dummy")
         #add dummy vertex to avoid errors when adding to empty graph
-        self.has_dummy = 1
+        self.g.add_vertex(name="dummy")
+        self.has_dummy = True
 
-    # Adds data from a fuse map to a graph. Assumes that the first row is
+    # Adds data from a fuse map to the graph field. Assumes that the first row is
     #   a header, and all others contain pin data. Graph must not be empty.
-    # g: Graph to add vertices to.
-    # wb_path: Path object pointing to workbook containing fuse map.
-    # conn_col: Letter of column containing connector information.
-    # pin_col: Letter of column conatining pin information.
-    # fuse_col: Letter of column containing fuse rating.
+    # fusemap: the list of PDC contents to add to the graph
     def add_pdc(self, fusemap):
 
         for row in fusemap:
@@ -31,24 +27,16 @@ class GraphManager:
             else: #if vertex exists, update fuse rating
                 self.g.vs.find(name=vname).update_attributes({'fuse_rating':vfuse})
         #delete dummy vertex if it exists
-        if self.has_dummy > 1:
+        if (self.has_dummy):
             self.g.vs.find(name="dummy").delete()
-            self.g.has_dummy = 0
+            self.has_dummy = False
         print('added  pdc to graph')
 
-    # Adds data from a wire report to a graph. Assumes that the first row is
-    #   a header, and all others contain pin data. Graph must not be empty.
-    # g: Graph to add data to.
-    # wb_path: Path object pointing to workbook containing wire report.
-    # fc_col: Letter of column containing from connector.
-    # fp_col: Letter of column conatining from pin.
-    # tc_col: Letter of column containing to connector.
-    # tp_col: Letter of column conatining to pin.
-    # wirename_col: Letter of column containing wire name.
-    # csa_col: Letter of column containing cross-sectional area.
+    # Adds data from a wire report object to the graph. Graph must not be empty.
+    # report: the report object from which to add data
     def add_report(self, report):
 
-        contents = report.sheet_list
+        contents = report.getContents()
 
         for row in contents:
             f_tup = row["FROM"]
@@ -72,12 +60,13 @@ class GraphManager:
             if len(self.g.vs.select(name=tname)) == 0:
                 self.g.add_vertex(name=tname, connector=tconn, pin=tpin, fuse_rating=0.0)
 
-            #create edge between from and to with csa, if not NoneType
-            if("None" not in fname and "None" not in tname):
-                self.g.add_edge(fname, tname, wire=desc, csa=ecsa)
+            #create edge between from and to with csa and description
+            self.g.add_edge(fname, tname, wire=desc, csa=ecsa)
 
         print('added ', report.filename, ' to graph')
 
+    #finds loops in the directed graphmanager graph
+    #TODO: only works on directed graphs
     def find_splices(self, i=0, tracking_list=[]):
         if(i in tracking_list):
             print("loop detected starting at ", i)

@@ -128,7 +128,6 @@ class App(QMainWindow):
 
         #prints all column fields for all wire reports
         def print_dict():
-
             print("num of reports " + str(num_wire_reports))
             for path, combo_list in combo_box_dict.items():
                 print(path)
@@ -158,6 +157,7 @@ class App(QMainWindow):
                 for report in self.parser.reports:
                     self.graph.add_report(report)
                 print(self.graph.g)
+                #self.graph.find_splices()
 
 
         self.wire_report_list.itemClicked.connect(lambda: change_wire_report(self.wire_report_list.currentIndex()))
