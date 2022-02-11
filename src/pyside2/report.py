@@ -2,13 +2,15 @@ import openpyxl, os
 from openpyxl import Workbook, load_workbook
 '''
    Report: modeling a single excel wire report file
+   Author: Ian Bansenauer
    Properties:
    filepath: the path of the report file
    filename: the name of the original file
    toLabels: a tuple of strings containing the column labels of TO (component, pin)
    fromLabels: a tuple of strings containing the column labels of FROM (component, pin)
    sheet_list: a list output of the report contents in
-    {FROM: (component, pin), TO: (component, pin) CSA, DESC} dictionary format
+    {FROM: (component, pin), TO: (component, pin) CSA:int, DESC:str} dictionary format
+    read(): reads the report stored in filepath and adds it to sheet_list
 '''
 class Report:
 

@@ -2,6 +2,17 @@ from igraph import *
 from openpyxl import *
 from report import Report
 
+'''
+   GraphManager: Class to handle graph operations, reading, writing, traversal
+   Fields:
+    graph: The igraph graph on which to perform operations
+   Methods:
+    add_pdc(pdc_list): adds the specified PDC list to the graph and updates fuse rating
+    add_report(): adds the specified report object to the graph, creating edges between from
+        and to (component, pin) combinations
+    with attributes
+    find_splices(): finds loops in a directed graph. W.I.P.
+'''
 class GraphManager:
 
     def __init__(self):
@@ -10,12 +21,14 @@ class GraphManager:
         self.g.add_vertex(name="dummy")
         self.has_dummy = True
 
-    # Adds data from a fuse map to the graph field. Assumes that the first row is
-    #   a header, and all others contain pin data. Graph must not be empty.
-    # fusemap: the list of PDC contents to add to the graph
-    def add_pdc(self, fusemap):
 
-        for row in fusemap:
+    #addPDC(pdc_list)
+    #pdc_list: list of dictionaries of pdc returned from InputParser.readPDC()
+    # Adds data from a fuse map list to the graph.
+    #updates fuse_rating attribute if nodes already exist
+    def addPDC(self, pdc_list):
+
+        for row in pdc_list:
             #get vertex information
             vconn = row['CONNECTOR'][0]
             vpin = row['CONNECTOR'][1]
@@ -32,9 +45,11 @@ class GraphManager:
             self.has_dummy = False
         print('added  pdc to graph')
 
-    # Adds data from a wire report object to the graph. Graph must not be empty.
-    # report: the report object from which to add data
-    def add_report(self, report):
+    #addReport(report)
+    #report: report object to add (from InputParser.readReport())
+    # Adds nodes from a wire report object to the graph. Graph cannot be empty.
+    # adds wires between nodes in the report, updating wire csa and wire description
+    def addReport(self, report):
 
         contents = report.getContents()
 
@@ -65,9 +80,10 @@ class GraphManager:
 
         print('added ', report.filename, ' to graph')
 
-    #finds loops in the directed graphmanager graph
+    #findSplices(report)
     #TODO: only works on directed graphs
-    def find_splices(self, i=0, tracking_list=[]):
+    #Work in progress
+    def findSplices(self, i=0, tracking_list=[]):
         if(i in tracking_list):
             print("loop detected starting at ", i)
             return
@@ -77,7 +93,7 @@ class GraphManager:
         if len(neighbors) > 1:
             print("splice with ", i, "to ", neighbors)
             for x in neighbors:
-                self.find_splices(x, tracking_list)
+                self.findSplices(x, tracking_list)
         elif len(neighbors) == 1:
             print(neighbors)
-            self.find_splices(neighbors[0], tracking_list)
+            self.findSplices(neighbors[0], tracking_list)
