@@ -77,7 +77,7 @@ class GraphManager:
 
         print('added ', report.filename, ' to graph')
 
-    def find_splices(self, i, tracking_list):
+    def find_splices(self, i=0, tracking_list=[]):
         if(i in tracking_list):
             print("loop detected starting at ", i)
             return
@@ -91,3 +91,11 @@ class GraphManager:
         elif len(neighbors) == 1:
             print(neighbors)
             self.find_splices(neighbors[0], tracking_list)
+
+    # Traces each wire in the graph from the PDC to its endpoint.
+    # Returns a list of 3-tuples, where each tuple represents a wire.
+    # The first element is the name of the start vertex.
+    # The second element is the name of the end vertex.
+    # The third element is the lowest CSA of any point on the wire.
+    def traverse(self):
+        pass
