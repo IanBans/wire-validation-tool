@@ -1,4 +1,4 @@
-import sys, openpyxl, os, inputparser, igraph
+import sys, openpyxl, os, inputparser
 from pathlib import Path
 from inputparser import InputParser
 from graphmanager import *
@@ -148,7 +148,8 @@ class App(QMainWindow):
                     list.append(box.currentText())
                 self.wire_report_dict.update({key : list})
 
-        #send reports to input Parser
+        # send reports to input Parser
+        # & print current graph data
         def sendReports():
             for path, fields in self.wire_report_dict.items():
                 from_tuple = (fields[0], fields[1])
@@ -158,7 +159,12 @@ class App(QMainWindow):
                     self.graph.addPDC(pdc)
                 for report in self.parser.reports:
                     self.graph.addReport(report)
-                print(self.graph.g)
+
+
+                for node in list(self.graph.g.nodes.data()):
+                    print(node)
+                for edge in list(self.graph.g.edges.data()):
+                    print(edge)
 
 
         self.wire_report_list.itemClicked.connect(lambda: changeWireReport(self.wire_report_list.currentIndex()))
