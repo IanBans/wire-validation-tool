@@ -3,7 +3,6 @@ import os
 from report import Report
 
 
-
 class InputParser:
     """
        InputParser: Functions to parse and store data from files
@@ -50,7 +49,6 @@ class InputParser:
         else:
             print("invalid filename passed to readPDC...")
             return []
-
 
     def readReport(self, filename, from_labels, to_labels, csa, desc):
         """

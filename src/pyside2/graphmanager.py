@@ -1,7 +1,7 @@
 import networkx as nx
 
-class GraphManager:
 
+class GraphManager:
     """
    GraphManager: Class to handle graph operations, reading, writing, traversal
    Fields:
@@ -16,8 +16,6 @@ class GraphManager:
     def __init__(self):
         self.g = nx.Graph()
 
-
-
     def addPDC(self, pdc_list):
         """
         pdc_list: list of dictionaries of pdc returned from InputParser.readPDC()
@@ -25,7 +23,7 @@ class GraphManager:
         updates fuse_rating attribute if nodes already exist
         """
         for row in pdc_list:
-            #get vertex information
+            # get vertex information
             vconn = row['CONNECTOR'][0]
             vpin = row['CONNECTOR'][1]
             vname = vconn + "|" + vpin
@@ -38,7 +36,6 @@ class GraphManager:
                 self.g.nodes[vname]['fuse_rating'] = vfuse
 
         print('added  pdc to graph')
-
 
     def addReport(self, report):
         """

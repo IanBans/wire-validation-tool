@@ -130,7 +130,6 @@ class App(QMainWindow):
         next_button.clicked.connect(lambda: self.gotoPage("wire_reports"))
         file_picker_layout.addWidget(next_button, 1, 0)
 
-
     def setupWireReports(self):
         """
             customize column fields page
@@ -270,7 +269,8 @@ class App(QMainWindow):
         if filename:
             button.setText(filename)
 
-def readColumnNames( filename):
+
+def readColumnNames(filename):
     """
             filename: full file path of report file
             gets first line of worksheet
@@ -284,6 +284,7 @@ def readColumnNames( filename):
         for first_row in sheet.iter_rows(1, 1, 1, sheet.max_column, True):
             names = list(first_row)
     return names
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
