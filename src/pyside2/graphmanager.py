@@ -1,5 +1,8 @@
 import networkx as nx
-'''
+
+class GraphManager:
+
+    """
    GraphManager: Class to handle graph operations, reading, writing, traversal
    Fields:
     graph: The networkx graph on which to perform operations
@@ -8,19 +11,19 @@ import networkx as nx
     addReport(): adds the specified report object to the graph, creating edges between from
         and to (component, pin) combinations
     with attributes
-'''
-class GraphManager:
+    """
 
     def __init__(self):
         self.g = nx.Graph()
 
 
-    # addPDC(pdc_list)
-    # pdc_list: list of dictionaries of pdc returned from InputParser.readPDC()
-    # Adds data from a fuse map list to the graph.
-    # updates fuse_rating attribute if nodes already exist
-    def addPDC(self, pdc_list):
 
+    def addPDC(self, pdc_list):
+        """
+        pdc_list: list of dictionaries of pdc returned from InputParser.readPDC()
+        Adds data from a fuse map list to the graph.
+        updates fuse_rating attribute if nodes already exist
+        """
         for row in pdc_list:
             #get vertex information
             vconn = row['CONNECTOR'][0]
@@ -36,12 +39,13 @@ class GraphManager:
 
         print('added  pdc to graph')
 
-    # addReport(report)
-    # report: report object to add (from InputParser.readReport())
-    # Adds nodes from a wire report object to the graph. Graph cannot be empty.
-    # adds wires between nodes in the report, updating wire csa and wire description
-    def addReport(self, report):
 
+    def addReport(self, report):
+        """
+        report: report object to add (from InputParser.readReport())
+        Adds nodes from a wire report object to the graph. Graph cannot be empty.
+        adds wires between nodes in the report, updating wire csa and wire description
+        """
         contents = report.getContents()
 
         for row in contents:
