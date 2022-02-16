@@ -22,5 +22,5 @@ jobs:
         pip install pep8-naming
     - name: Analysing the code with pylint
       run: |
-        pylint --rcfile=pylintrc $(git ls-files '*.py')
+        pylint --rcfile=$(git ls-files '*pylintrc') $(git ls-files '*.py')
         pycodestyle $(git ls-files '*.py')
