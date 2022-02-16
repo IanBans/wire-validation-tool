@@ -20,7 +20,7 @@ jobs:
         pip install pylint 
         pip install flake8
         pip install pep8-naming
-        pip install -r $(git ls-files requirements.txt)
+        pip install -r $(git ls-files '*requirements.txt')
     - name: Analysing the code with pylint
       run: |
         pylint --rcfile=$(git ls-files '*pylintrc') $(git ls-files '*.py')
