@@ -23,5 +23,5 @@ jobs:
         pip install -r $(git ls-files '*requirements.txt')
     - name: Analysing the code with pylint
       run: |
-        pylint --rcfile=$(git ls-files '*pylintrc') $(git ls-files '*.py')
+        pylint --rcfile=$(git ls-files '*pylintrc') --fail-under=9.5 $(git ls-files '*.py')
         pycodestyle $(git ls-files '*.py')
