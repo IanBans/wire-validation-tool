@@ -22,6 +22,7 @@ class App(QMainWindow):
         goToPage(): sets stacked_widget page to target
         setupFilePage(): sets up file picker page
         setupWireReports(): sets up column picker for each report
+        readColumnNames(): helper function for wire report dropdowns
     """
     # sets up UI and create parser and GraphManager instances
     def __init__(self):
