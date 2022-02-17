@@ -51,7 +51,6 @@ class GraphManager:
 
         print('added  pdc to graph')
 
-
     def addReport(self, report):
         """
         report: report object to add (from InputParser.readReport())
