@@ -37,7 +37,7 @@ class App(QMainWindow):
 
     def setupUI(self):
         """
-          sets up UI elements and ties them together
+            sets up UI elements and ties them together
         """
 
         front_page = QWidget()
@@ -192,11 +192,11 @@ class App(QMainWindow):
                 to_tuple = (fields[2], fields[3])
                 self.parser.readReport(path, from_tuple, to_tuple, fields[4], fields[5])
 
-            for name, pdc in self.parser.getPDCs().items():
+            for _, pdc in self.parser.getPDCs().items():
                 self.graph.addPDC(pdc)
 
             for report in self.parser.getReports():
-                    self.graph.addReport(report)
+                self.graph.addReport(report)
 
             self.graph.printNodes()
             self.graph.printEdges()
@@ -209,7 +209,6 @@ class App(QMainWindow):
         page_layout.addWidget(self.wire_report_list, 0, 0)
 
         page_layout.addWidget(fields_selector, 0, 1)
-
 
         # create combo boxes and add them to page
         for wire_report in self.wire_report_paths:

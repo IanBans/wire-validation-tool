@@ -3,14 +3,18 @@ import networkx as nx
 
 class GraphManager:
     """
-   GraphManager: Class to handle graph operations, reading, writing, traversal
-   Fields:
-    _g: The networkx graph on which to perform operations
-   Methods:
-    addPDC(pdc_list): adds the specified PDC list to the graph and updates fuse rating
-    addReport(): adds the specified report object to the graph, creating edges between from
-        and to (component, pin) combinations
-    with attributes
+        GraphManager: Class to handle graph operations, reading, writing, traversal
+        Fields:
+            _g: The networkx graph on which to perform operations
+        Methods:
+            addPDC(pdc_list): adds the specified PDC list to the graph and updates fuse rating
+            addReport(): adds the specified report object to the graph, creating edges between from
+                and to (component, pin) combinations
+                with attributes
+            printNodes():
+                prints all the nodes currently in the graph
+            printEdges:
+                prints all edges currently in the graph
     """
 
     def __init__(self):
@@ -18,23 +22,23 @@ class GraphManager:
 
     def printNodes(self):
         """
-        prints all nodes in the graph, one per line
+            prints all nodes in the graph, one per line
         """
         for node in list(self._g.nodes.data()):
             print(node)
 
     def printEdges(self):
         """
-        prints all edges in the graph, one per line
+            prints all edges in the graph, one per line
         """
         for edge in list(self._g.edges.data()):
             print(edge)
 
     def addPDC(self, pdc_list):
         """
-        pdc_list: list of dictionaries of pdc returned from InputParser.readPDC()
-        Adds data from a fuse map list to the graph.
-        updates fuse_rating attribute if nodes already exist
+            pdc_list: list of dictionaries of pdc returned from InputParser.readPDC()
+            Adds data from a fuse map list to the graph.
+            updates fuse_rating attribute if nodes already exist
         """
         for row in pdc_list:
             # get vertex information
@@ -53,9 +57,9 @@ class GraphManager:
 
     def addReport(self, report):
         """
-        report: report object to add (from InputParser.readReport())
-        Adds nodes from a wire report object to the graph. Graph cannot be empty.
-        adds wires between nodes in the report, updating wire csa and wire description
+            report: report object to add (from InputParser.readReport())
+            Adds nodes from a wire report object to the graph. Graph cannot be empty.
+            adds wires between nodes in the report, updating wire csa and wire description
         """
         contents = report.getContents()
 
