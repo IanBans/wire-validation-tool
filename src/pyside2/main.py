@@ -20,8 +20,8 @@ class App(QMainWindow):
         setupUI(): creates the UI structure and elements
         readColumnNames(): helper function to fill the column drop down lists
         goToPage(): sets stacked_widget page to target
-        setupFilePage(): sets up file file picker
-        setupWireReports():
+        setupFilePage(): sets up file picker page
+        setupWireReports(): sets up column picker for each report
     """
     # sets up UI and create parser and GraphManager instances
     def __init__(self):
