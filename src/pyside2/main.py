@@ -168,9 +168,9 @@ class App(QMainWindow):
                 from_tuple = (fields[0], fields[1])
                 to_tuple = (fields[2], fields[3])
                 self.parser.readReport(path, from_tuple, to_tuple, fields[4], fields[5])
-                for pdc in self.parser.pdcs.values():
+                for pdc in self.parser.getPDCs().values():
                     self.graph.addPDC(pdc)
-                for report in self.parser.reports:
+                for report in self.parser.getReports():
                     self.graph.addReport(report)
             self.graph.printNodes()
             self.graph.printEdges()

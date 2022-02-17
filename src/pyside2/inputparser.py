@@ -19,21 +19,31 @@ class InputParser:
     """
 
     def __init__(self):
-        self.reports = []
-        self.pdcs = {}
+        self._reports = []
+        self._pdcs = {}
+
+    def getReports(self):
+        """
+            getter for reports
+        """
+        return self._reports
+
+    def getPDCs(self):
+        """
+            getter for pdc list
+        """
+        return self._pdcs
 
     def readPDC(self, filename):
-
         """
             filename: full file path of pdc file
             Reads the PDC fuse map CSV and returns a list of dictionaries
             Each element in the list is a row of the PDC file, in dict format
             {CONNECTOR: (component,pin), FUSE:fuse rating}
         """
-
         if filename:
             contents_list = []
-            with open(filename, mode='r') as csv_file:
+            with open(filename, mode='rt') as csv_file:
                 pdc_dict = csv.DictReader(csv_file, delimiter=',')
                 print("Successfully opened pdc fuse map..")
                 name = os.path.basename(filename)
@@ -42,8 +52,8 @@ class InputParser:
                     contents["CONNECTOR"] = (line["CONNECTOR"], line["PIN"])
                     contents["FUSE"] = line["FUSE RATING"]
                     contents_list.append(contents)
-                if name not in self.pdcs:
-                    self.pdcs[name] = contents_list
+                if name not in self._pdcs:
+                    self._pdcs[name] = contents_list
                 return contents_list
 
         else:
@@ -62,12 +72,5 @@ class InputParser:
             self.reports list, and returns the data
         """
         report = Report(filename, from_labels, to_labels, csa, desc)
-        self.reports.append(report)
+        self._reports.append(report)
         return report
-
-    def getReports(self):
-        """
-            getter for list of reports
-        """
-
-        return self.reports
