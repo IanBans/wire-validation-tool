@@ -28,7 +28,6 @@ class App(QMainWindow):
         self.wire_report_list = QListWidget()
         self.pdc_paths = []
 
-        self.wire_report_dict = {}
         self.setupUI()
 
     def setupUI(self):
@@ -134,16 +133,19 @@ class App(QMainWindow):
         """
             customize column fields page
         """
+        wire_report_dict = {}
+
         def changeWireReport(index):
             fields_selector.setCurrentIndex(index.row())
 
         # prints all column fields for all wire reports
-        def printDict():
-            print("num of reports " + str(num_wire_reports))
-            for path, combo_list in combo_box_dict.items():
-                print(path)
-                for box in combo_list:
-                    print(box.currentText())
+        # unused debug function TODO: remove
+        # def printDict():
+        #   print("num of reports " + str(num_wire_reports))
+        #    for path, combo_list in combo_box_dict.items():
+        #       print(path)
+        #       for box in combo_list:
+        #           print(box.currentText())
 
         # send files to input parser
         for path in self.pdc_paths:
@@ -157,12 +159,12 @@ class App(QMainWindow):
                 report_list = []
                 for box in value:
                     report_list.append(box.currentText())
-                self.wire_report_dict.update({key: report_list})
+                wire_report_dict.update({key: report_list})
 
         # send reports to input Parser
         # & print current graph data
         def sendReports():
-            for path, fields in self.wire_report_dict.items():
+            for path, fields in wire_report_dict.items():
                 from_tuple = (fields[0], fields[1])
                 to_tuple = (fields[2], fields[3])
                 self.parser.readReport(path, from_tuple, to_tuple, fields[4], fields[5])
@@ -170,15 +172,11 @@ class App(QMainWindow):
                     self.graph.addPDC(pdc)
                 for report in self.parser.reports:
                     self.graph.addReport(report)
-
-                for node in list(self.graph.g.nodes.data()):
-                    print(node)
-                for edge in list(self.graph.g.edges.data()):
-                    print(edge)
+            self.graph.printNodes()
+            self.graph.printEdges()
 
         self.wire_report_list.itemClicked.connect(
             lambda: changeWireReport(self.wire_report_list.currentIndex()))
-        num_wire_reports = len(self.wire_report_paths)
 
         # this list contains all the column fields names.
         fields_list = ["From Component",
@@ -212,7 +210,7 @@ class App(QMainWindow):
             fields_container.setLayout(fields_layout)
             combo_box_list = []
             combo_box_dict.update({wire_report: combo_box_list})
-            column_names = self.readColumnNames(wire_report)
+            column_names = readColumnNames(wire_report)
 
             for i, _ in enumerate(fields_list):
                 combo_box = QComboBox()

@@ -42,7 +42,7 @@ class InputParser:
                     contents["CONNECTOR"] = (line["CONNECTOR"], line["PIN"])
                     contents["FUSE"] = line["FUSE RATING"]
                     contents_list.append(contents)
-                if name not in self.pdcs.keys():
+                if name not in self.pdcs:
                     self.pdcs[name] = contents_list
                 return contents_list
 
