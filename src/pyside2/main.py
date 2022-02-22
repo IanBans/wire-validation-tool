@@ -1,209 +1,251 @@
-import sys, openpyxl, os, inputparser, igraph
+import sys
 from pathlib import Path
+
+import PySide2.QtWidgets
+from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
+from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
+from PySide2.QtWidgets import QApplication
+from PySide2.QtGui import QFont, Qt
+from openpyxl import load_workbook
 from inputparser import InputParser
-from graphmanager import *
-from PySide2 import QtWidgets, QtUiTools
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
-from PySide2.QtCore import QRect, QFile, QIODevice, QObject
-from openpyxl import Workbook, load_workbook
+from graphmanager import GraphManager
+
 
 class App(QMainWindow):
-    # setup UI and create parser
+    """
+       App: the main UI and entry point for the application
+       Fields:
+        parser: input parser object to get input from files
+        graph: GraphManager instance to store data into.
+        stacked_widget: the main window container
+       Methods:
+        setupUI(): creates the UI structure and elements
+        readColumnNames(): helper function to fill the column drop down lists
+        goToPage(): sets stacked_widget page to target
+        setupFilePage(): sets up file picker page
+        setupWireReports(): sets up column picker for each report
+        readColumnNames(): helper function for wire report dropdowns
+    """
+    # sets up UI and create parser and GraphManager instances
     def __init__(self):
         super().__init__()
         self.parser = InputParser()
         self.graph = GraphManager()
-        self.wire_graph = self.graph.g
-        self.setup_ui()
-
-    def setup_ui(self):
-        #stacked widget is the container that can be swapped out to change pages
         self.stacked_widget = QStackedWidget()
+        self.wire_report_paths = []
+        self.wire_report_list = QListWidget()
+        self.pdc_paths = []
 
-        self.stacked_widget.setMinimumSize(500, 400)
-        self.stacked_widget.setWindowTitle("Paccar Wire Validation Tool")
+        self.setupUI()
+
+    def setupUI(self):
+        """
+            sets up UI elements and ties them together
+        """
 
 
-        front_page = QWidget()
-        #dictionary that contains all pages for navigation
-        self.pages = {"front": front_page}
 
-        #front page settup. nothing much here
-        front_page_layout = QGridLayout()
-        self.stacked_widget.addWidget(front_page)
-        front_page.setLayout(front_page_layout)
-        font = QFont("Helvetica", 20)
-        welcome = QLabel("Paccar Wire Validation Tool")
-        welcome.setFont(font)
-        welcome.setAlignment(Qt.AlignCenter)
-        front_page_layout.addWidget(welcome, 0, 0)
 
-        #add button to go to nexxt page
-        file_page_1_button = QPushButton("Next")
-        file_page_1_button.clicked.connect(lambda : self.goto_page("file_picker"))
-        front_page_layout.addWidget(file_page_1_button, 1, 0)
+        self.stacked_widget.setMinimumSize(800, 450)
+        self.stacked_widget.setWindowTitle('Paccar Wire Validation Tool')
 
+        #below code is a placeholder front page that is commented out
+
+        # dictionary that contains all pages for navigation
+        #self.pages = {'front': front_page}
+        self.pages = {}
+
+        # sets up front page
+        #front_page_layout = QGridLayout()
+        #front_page = QWidget()
+        #self.stacked_widget.addWidget(front_page)
+        #front_page.setLayout(front_page_layout)
+        #welcome.setFont(font)
+        #welcome.setAlignment(Qt.AlignCenter)
+        #front_page_layout.addWidget(welcome, 0, 0)
+
+        # welcome = QLabel('Paccar Wire Validation Tool')
+        # font = QFont('Helvetica', 20)
+        # file_page_1_button = QPushButton('Next')
+
+        # add button to go to next page
+        #file_page_1_button.clicked.connect(lambda: self.goToPage('file_picker'))
+        #front_page_layout.addWidget(file_page_1_button, 1, 0)
+
+        self.setupFilePage()
         self.stacked_widget.show()
 
         #Qwidget that contains paths of all wire Reports
         self.wire_report_list = QListWidget()
 
-        self.settup_file_page()
 
     #pages so far: "front", "file_picker", "wire_reports"
-    def goto_page(self, target):
+    def goToPage(self, target):
 
         if target in self.pages:
             self.stacked_widget.setCurrentWidget(self.pages[target])
 
-    #settup for picking all wire reports and PDC
-    def settup_file_page(self):
-
-        def add_wire_report():
-            next_wire_report_button = QPushButton("Choose Wire Report")
-            next_wire_report_button.clicked.connect(lambda : self.openExcelFileDialog(next_wire_report_button))
-            path_label = QLabel("File Path")
-            left_widget_layout.insertRow(left_widget_layout.rowCount() - 1, next_wire_report_button)
+    # setup for picking all wire reports and PDC
+    def setupFilePage(self):
+        """
+            sets up the file picker page
+        """
 
 
-
-        def add_PDC():
-            next_PDC_button = QPushButton("Choose PDC")
-            next_PDC_button.clicked.connect(lambda : self.openCSVFileDialog(next_PDC_button))
-
-            right_widget_layout.insertRow(right_widget_layout.rowCount() - 1, next_PDC_button)
-
-
-
-        self.wire_report_paths = []
-
-        self.pdc_paths = []
 
         file_picker_widgets = QWidget()
         file_picker_layout = QGridLayout()
-        self.stacked_widget.addWidget(file_picker_widgets)
+        next_button = QPushButton('Next')
+        pdc_button = QPushButton('Add PDC')
+        #add_pdc_button = QPushButton('add PDC')
+        wire_button = QPushButton('Add Wire Reports')
+        save = QPushButton("Choose Where to Save ...")
+        save.clicked.connect(self.openSaveFileDialog)
+        #add_wire_button = QPushButton('add wire report')
 
+        self.stacked_widget.addWidget(file_picker_widgets)
         file_picker_widgets.setLayout(file_picker_layout)
 
-        left_widget_layout = QFormLayout()
-        right_widget_layout = QFormLayout()
-        file_picker_layout.addLayout(left_widget_layout, 0, 0)
-        file_picker_layout.addLayout(right_widget_layout, 0, 1)
+        self.left_widget_layout = QFormLayout()
+        self.right_widget_layout = QFormLayout()
+        file_picker_layout.addLayout(self.left_widget_layout, 0, 0)
+        file_picker_layout.addLayout(self.right_widget_layout, 0, 1)
 
-        #left side of page
-        wire_button = QPushButton("Choose Wire Report...")
-        left_widget_layout.addRow(wire_button)
-        wire_button.clicked.connect(lambda: self.openExcelFileDialog(wire_button))
-        add_wire_button = QPushButton("add wire report")
-        add_wire_button.clicked.connect(add_wire_report)
-        left_widget_layout.addRow(add_wire_button)
 
-        #right side of page
-        PDC_button = QPushButton("Choose PDC...")
-        right_widget_layout.addRow(PDC_button)
-        add_PDC_button = QPushButton("add PDC")
-        add_PDC_button.clicked.connect(add_PDC)
-        right_widget_layout.addRow(add_PDC_button)
-        PDC_button.clicked.connect(lambda : self.openCSVFileDialog(PDC_button))
 
-        #register current page
+        # add buttons for wire reports to left side
+
+        self.left_widget_layout.addRow(wire_button)
+        wire_button.clicked.connect(self.openExcelFileDialog)
+
+
+        # add buttons for pdc to right side
+
+        self.right_widget_layout.addRow(pdc_button)
+        pdc_button.clicked.connect(self.openCSVFileDialog)
+
+        # register current page in page dict
         self.stacked_widget.addWidget(file_picker_widgets)
-        self.pages.update({"file_picker": file_picker_widgets})
+        self.pages.update({'file_picker': file_picker_widgets})
 
-        #button to next page
-        #the next button is also the trigger to set up the next page since it relies on data collected from this current page
-        next_button = QPushButton("Next")
-        next_button.clicked.connect(self.setup_wire_reports)
-        next_button.clicked.connect(lambda: self.goto_page("wire_reports"))
-        file_picker_layout.addWidget(next_button, 1, 0)
+        # add button to next page
+        # the next button is also the trigger
+        # to set up the next page since it relies on data
+        # collected from this current page
 
-    #customize column fields page
-    #currently saves data to self.model but does not record data properly
-    def setup_wire_reports(self):
+        next_button.clicked.connect(self.setupWireReports)
+        next_button.clicked.connect(lambda: self.goToPage('wire_reports'))
+        file_picker_layout.addWidget(next_button, 2, 0)
+        file_picker_layout.addWidget(save, 1, 0)
 
-        def change_wire_report(index):
-            fields_selector.setCurrentIndex(index.row())
-
-        #prints all column fields for all wire reports
-        def print_dict():
-
-            print("num of reports " + str(num_wire_reports))
-            for path, combo_list in combo_box_dict.items():
-                print(path)
-                for box in combo_list:
-                    print(box.currentText())
-
-        #send files to input parser
-        for path in self.pdc_paths:
-            if path:
-                self.parser.readPDC(path)
-
-
-        #create a new dictionary from combobox_dict where it is populated by strings instead of combobox objects
-        def make_dict():
-            for key, value in combo_box_dict.items():
-                list = []
-                for box in value:
-                    list.append(box.currentText())
-                self.wire_report_dict.update({key : list})
-        #send reports to input Parser
-        def send_reports():
-            for path, fields in self.wire_report_dict.items():
-                from_tuple = (fields[0], fields[1])
-                to_tuple = (fields[2], fields[3])
-                self.parser.readReport(path, from_tuple, to_tuple, fields[4], fields[5])
-                for pdc in self.parser.pdcs.values():
-                    self.graph.add_pdc(pdc)
-                for report in self.parser.reports:
-                    self.graph.add_report(report)
-                print(self.graph.g)
-
-
-        self.wire_report_list.itemClicked.connect(lambda: change_wire_report(self.wire_report_list.currentIndex()))
-        num_wire_reports = len(self.wire_report_paths)
-
-        #this list contains all the column fields names.
-        fields_list = ["From Component", "From Pin",  "To Component", "To Pin", "Wire CSA", "Description"]
-
+    def setupWireReports(self):
+        """
+            customize column fields for each report
+        """
+        wire_report_dict = {}
+        # this list contains all the column fields names
+        # necessary for reading the input
+        fields_list = ['From Component',
+                       'From Pin',
+                       'To Component',
+                       'To Pin',
+                       'Wire CSA',
+                       'Description']
 
         page = QWidget()
         page_layout = QGridLayout()
-        page.setLayout(page_layout)
-
-        self.stacked_widget.addWidget(page)
-        self.pages.update({"wire_reports": page})
-
-
-        page_layout.addWidget(self.wire_report_list, 0, 0)
         fields_selector = QStackedWidget()
+        submit = QPushButton('Submit')
+        # the Dictionary that contains all the wire column fields.
+        # The key is the wire path and the value is a list of QComboBoxes
+        # that contain wire fields
+        combo_box_dict = {}
+
+
+
+        def makeDict():
+            """
+                create a new dictionary from combobox_dict
+                where it is populated by strings instead of
+                combobox objects
+            """
+            for key, value in combo_box_dict.items():
+                report_list = []
+                for box in value:
+                    report_list.append(box.currentText())
+                wire_report_dict.update({key: report_list})
+
+        def sendReports():
+            """
+                send reports to input Parser
+                & print current graph data
+            """
+            # send pdc to input parser
+            for path in self.pdc_paths:
+                if path:
+                    self.parser.readPDC(path)
+
+
+            for path, fields in wire_report_dict.items():
+                from_tuple = (fields[0], fields[1])
+                to_tuple = (fields[2], fields[3])
+                self.parser.readReport(path, from_tuple, to_tuple, fields[4], fields[5])
+
+            for _, pdc in self.parser.getPDCs().items():
+                self.graph.addPDC(pdc)
+
+            for report in self.parser.getReports():
+                self.graph.addReport(report)
+
+            self.graph.printNodes()
+            self.graph.printEdges()
+
+        self.wire_report_list.itemClicked.connect(
+            lambda: fields_selector.setCurrentIndex(self.wire_report_list.currentIndex().row()))
+        page.setLayout(page_layout)
+        self.stacked_widget.addWidget(page)
+        self.pages.update({'wire_reports': page})
+        page_layout.addWidget(self.wire_report_list, 0, 0)
+
         page_layout.addWidget(fields_selector, 0, 1)
 
+        #demo code to show what might look like to save and load wire harness configurations
 
-        #the Dictionary that contains all the wire columnn fields. The key is the wire path and the value is a list of QComboBoxes thatt contain wire fields
-        combo_box_dict = {}
-        #the real dictionary that has the same data as the above dict but stores the data as a list of strings instead of a list of QWidgets
-        self.wire_report_dict = {}
+        mini_layout = QGridLayout()
+        mini_layout.addWidget(PySide2.QtWidgets.QLabel("Or select saved wire report format"), 0, 2)
+        comboBox = QComboBox()
+        comboBox.addItem("Choose Option")
+        comboBox.addItem("Roof")
+        comboBox.addItem("wire_report_1231424")
+        comboBox.addItem("wire_report_243862")
+        comboBox.addItem("Engine")
+        checkbox = PySide2.QtWidgets.QCheckBox()
+        checkbox.setText("click here If you wish to save the above configuration for future use")
+        line = PySide2.QtWidgets.QLineEdit()
+        line.setText("enter the name of this configuration")
+        mini_layout.addWidget(comboBox, 1, 2)
+        mini_layout.addWidget(checkbox, 0, 0)
+        mini_layout.addWidget(line, 1, 0)
+        page_layout.addLayout(mini_layout, 1, 1)
 
-
-        #create combo boxes and add them to page
+        # create combo boxes and add them to page
         for wire_report in self.wire_report_paths:
 
             fields_layout = QFormLayout()
             fields_container = QWidget()
-            fields_container.setLayout(fields_layout)
             combo_box_list = []
-            combo_box_dict.update({wire_report : combo_box_list})
-            column_names = self.parser.readColumnNames(wire_report)
+            fields_container.setLayout(fields_layout)
+            combo_box_dict.update({wire_report: combo_box_list})
+            column_names = readColumnNames(wire_report)
 
-            for i in range(len(fields_list)):
+            for i, _ in enumerate(fields_list):
                 combo_box = QComboBox()
-                combo_box.addItem("Choose Option")
+                label = QLabel(fields_list[i])
+                combo_box.addItem('Choose Option')
+
                 for name in column_names:
                     combo_box.addItem(name)
 
-                label = QLabel(fields_list[i])
                 combo_box_list.append(combo_box)
                 combo_box.setCurrentIndex(0)
                 fields_layout.addRow(combo_box, label)
@@ -212,49 +254,115 @@ class App(QMainWindow):
 
         fields_selector.setCurrentIndex(0)
 
+        back = QPushButton("Back")
+        back.clicked.connect(lambda : self.goToPage("file_picker"))
+        page_layout.addWidget(back, 2, 0)
 
-        submit = QPushButton("Submit")
-        page_layout.addWidget(submit, 2, 0)
-        #submit.clicked.connect(print_dict)
-        submit.clicked.connect(make_dict)
-        submit.clicked.connect(send_reports)
+        page_layout.addWidget(submit, 2, 1)
+        submit.clicked.connect(makeDict)
+        submit.clicked.connect(sendReports)
 
-    def openCSVFileDialog(self, button):
+    def createReportLabel(self, path, side):
+        """
+            path: the file the label represents
+            side: determine if the label is created for a wire report or pdc
+            adds wire report or pdc path label to the view that shows the path
+        """
+
+        def removeReport(label):
+            """
+                removes the the specified label from the view and deletes the path anywhere it was saved
+            """
+            if side == "wire":
+                for item in range(self.wire_report_list.count()):
+                    if self.wire_report_list.item(item).text() == label.text():
+                        self.wire_report_list.takeItem(item)
+                self.wire_report_paths.remove(label.text())
+                self.left_widget_layout.removeRow(label)
+            else:
+                self.pdc_paths.remove(label.text())
+                self.right_widget_layout.removeRow(label)
+
+
+
+        remove_button = QPushButton("Remove")
+        label = QLabel(path)
+        remove_button.clicked.connect(lambda : removeReport(label))
+
+        if side == "wire":
+            self.left_widget_layout.addRow(label,remove_button)
+        else:
+            self.right_widget_layout.addRow(label, remove_button)
+
+
+
+    def openCSVFileDialog(self):
+        """
+            opens the file picker to select a dirctory to save the output to
+        """
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self,"Choose file", Path.home().as_posix(),"CSV Files (*.csv)", options=options)
-        self.pdc_paths.append(fileName)
 
-        if fileName:
-            button.setText(fileName)
+        filename, _ = QFileDialog.getOpenFileNames(self,
+                                                  'Choose file',
+                                                  Path.home().as_posix(),
+                                                  'CSV Files (*.csv)',
+                                                  options=options)
+        for file in filename:
+            if file not in self.pdc_paths:
+                self.pdc_paths.append(file)
+                self.createReportLabel(file, "pdc")
 
 
-
-
-    def openExcelFileDialog(self, button):
+    def openExcelFileDialog(self):
+        """
+            opens the file picker sorted to .excel files
+        """
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self,"Choose file", Path.home().as_posix(),"Excel Files (*.xlsx)", options=options)
-        #sace data for gui to use later
-        self.wire_report_paths.append(fileName)
-        self.wire_report_list.addItem(fileName)
-        if fileName:
-            button.setText(fileName)
+        filename, _ = QFileDialog.getOpenFileNames(self,
+                                                  'Choose file',
+                                                  Path.home().as_posix(),
+                                                  'Excel Files (*.xlsx)',
+                                                  options=options)
 
-    def openFileNamesDialog(self):
+
+        for file in filename:
+            if file not in self.wire_report_paths:
+                self.createReportLabel(file, "wire")
+                self.wire_report_paths.append(file)
+                self.wire_report_list.addItem(file)
+
+
+    def openSaveFileDialog(self):
+        """
+            opens the file picker sorted to .csv files
+            sets the button to the file name picked
+        """
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        files, _ = QFileDialog.getOpenFileNames(self,"choose files", Path.home().as_posix(),"Excel Files (*.xlsx)", options=options)
-        if files:
-            for file in files:
-                print(file)
+        fileName = QFileDialog.getExistingDirectory(self,
+                                                    "choose file to save",
+                                                    Path.home().as_posix())
+        #do something with save path
 
-    def saveFileDialog(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getSaveFileName(self,"choose file to save",Path.home().as_posix(),"All Files (*);;Text Files (*.txt)", options=options)
-        if fileName:
-            print(fileName)
+
+def readColumnNames(filename):
+    """
+        filename: full file path of report file
+        gets first line of worksheet
+        and returns it as a list
+        helper function for UI drop down boxes
+    """
+    names = []
+    if filename:
+        workb = load_workbook(filename, read_only=True)
+        sheet = workb.active
+
+        for first_row in sheet.iter_rows(1, 1, 1, sheet.max_column, True):
+            names = list(first_row)
+    return names
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
