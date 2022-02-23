@@ -46,7 +46,7 @@ class App(QMainWindow):
 
 
 
-        self.stacked_widget.setMinimumSize(800, 450)
+        self.stacked_widget.setMinimumSize(900, 450)
         self.stacked_widget.setWindowTitle('Paccar Wire Validation Tool')
 
         #below code is a placeholder front page that is commented out
@@ -95,13 +95,15 @@ class App(QMainWindow):
 
         file_picker_widgets = QWidget()
         file_picker_layout = QGridLayout()
+        file_picker_layout.setRowStretch(0,1)
         next_button = QPushButton('Next')
         pdc_button = QPushButton('Add PDC')
-        #add_pdc_button = QPushButton('add PDC')
         wire_button = QPushButton('Add Wire Reports')
+        wire_button.setMinimumWidth(400)
+        pdc_button.setMinimumWidth(400)
         save = QPushButton("Choose Where to Save ...")
         save.clicked.connect(self.openSaveFileDialog)
-        #add_wire_button = QPushButton('add wire report')
+
 
         self.stacked_widget.addWidget(file_picker_widgets)
         file_picker_widgets.setLayout(file_picker_layout)
@@ -135,8 +137,11 @@ class App(QMainWindow):
 
         next_button.clicked.connect(self.setupWireReports)
         next_button.clicked.connect(lambda: self.goToPage('wire_reports'))
-        file_picker_layout.addWidget(next_button, 2, 0)
-        file_picker_layout.addWidget(save, 1, 0)
+        file_picker_layout.addWidget(next_button, 2, 0, 2, 3)
+        file_picker_layout.addWidget(save, 1, 0, 1, 3)
+        save.setMaximumWidth(200)
+        next_button.setMaximumWidth(200)
+        #file_picker_layout.setSpacing(100)
 
     def setupWireReports(self):
         """
@@ -156,6 +161,7 @@ class App(QMainWindow):
         page_layout = QGridLayout()
         fields_selector = QStackedWidget()
         submit = QPushButton('Submit')
+
         # the Dictionary that contains all the wire column fields.
         # The key is the wire path and the value is a list of QComboBoxes
         # that contain wire fields
@@ -205,6 +211,7 @@ class App(QMainWindow):
         page.setLayout(page_layout)
         self.stacked_widget.addWidget(page)
         self.pages.update({'wire_reports': page})
+        self.wire_report_list.setMinimumWidth(300)
         page_layout.addWidget(self.wire_report_list, 0, 0)
 
         page_layout.addWidget(fields_selector, 0, 1)
@@ -220,13 +227,21 @@ class App(QMainWindow):
         comboBox.addItem("wire_report_243862")
         comboBox.addItem("Engine")
         checkbox = PySide2.QtWidgets.QCheckBox()
-        checkbox.setText("click here If you wish to save the above configuration for future use")
+        checkbox.setText("click here to save the above configuration for future use")
+        checkbox.resize(checkbox.sizeHint())
         line = PySide2.QtWidgets.QLineEdit()
         line.setText("enter the name of this configuration")
         mini_layout.addWidget(comboBox, 1, 2)
         mini_layout.addWidget(checkbox, 0, 0)
         mini_layout.addWidget(line, 1, 0)
         page_layout.addLayout(mini_layout, 1, 1)
+        mini_layout.setSpacing(20)
+        mini_layout.setMargin(20)
+        drawLine = PySide2.QtWidgets.QFrame()
+        drawLine.setFrameShape(PySide2.QtWidgets.QFrame.VLine)
+        drawLine.setFrameShadow(PySide2.QtWidgets.QFrame.Raised)
+        mini_layout.addWidget(drawLine, 0, 1, 3, 1)
+
 
         # create combo boxes and add them to page
         for wire_report in self.wire_report_paths:
@@ -256,9 +271,9 @@ class App(QMainWindow):
 
         back = QPushButton("Back")
         back.clicked.connect(lambda : self.goToPage("file_picker"))
-        page_layout.addWidget(back, 2, 0)
+        page_layout.addWidget(back, 2, 0, 1, 3)
+        page_layout.addWidget(submit, 3, 0, 1, 3)
 
-        page_layout.addWidget(submit, 2, 1)
         submit.clicked.connect(makeDict)
         submit.clicked.connect(sendReports)
 
@@ -273,8 +288,11 @@ class App(QMainWindow):
             """
                 removes the the specified label from the view and deletes the path anywhere it was saved
             """
+
             if side == "wire":
                 for item in range(self.wire_report_list.count()):
+                    if not self.wire_report_list.item(item):
+                        continue
                     if self.wire_report_list.item(item).text() == label.text():
                         self.wire_report_list.takeItem(item)
                 self.wire_report_paths.remove(label.text())
