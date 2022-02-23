@@ -1,6 +1,7 @@
 import sys, openpyxl, os, inputparser
 from pathlib import Path
 from inputparser import InputParser
+from export import ExportManager
 from graphmanager import *
 from PySide2 import QtWidgets, QtUiTools
 from PySide2.QtUiTools import QUiLoader
@@ -23,6 +24,7 @@ class App(QMainWindow):
         super().__init__()
         self.parser = InputParser()
         self.graph = GraphManager()
+        self.export = ExportManager()
         self.setupUI()
 
     def setupUI(self):
@@ -165,6 +167,10 @@ class App(QMainWindow):
                     print(node)
                 for edge in list(self.graph.g.edges.data()):
                     print(edge)
+
+                self.graph.removeCycles()
+                res = self.graph.traverse()
+                self.export.export_to_excel("test.csv", res)
 
 
         self.wire_report_list.itemClicked.connect(lambda: changeWireReport(self.wire_report_list.currentIndex()))

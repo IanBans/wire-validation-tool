@@ -97,6 +97,7 @@ class GraphManager:
     # currnode: The node added by the calling method.
     # lastnode: The node added prior to currnode.
     # data: Dictionary of information to report. Key structure is in the comment for traverse().
+    # TODO: Add loop handling without loop removal.
     def rtraverse(self, startnode, currnode, lastnode, data):
         output = []
         # update data with wire from lastnode to currnode
@@ -110,7 +111,7 @@ class GraphManager:
                     output += [wire]
         # check if this is the end of the wire
         if output == []:
-            output = [(startnode, currnode, data)]
+            output = [(startnode, currnode, data["min_csa"])]
         
         return output
 
