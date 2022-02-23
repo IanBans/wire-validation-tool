@@ -79,7 +79,7 @@ class GraphManager:
         # check if graph contains cycles
         if nx.cycle_basis(self.g) != []:
             print("ERROR: Graph contains cycle")
-            return -1
+            return (-1, -1, -1)
         # call rtraverse on all edges leading out of the PDC
         fr = nx.get_node_attributes(self.g, "fuse_rating")
         tuples = []
