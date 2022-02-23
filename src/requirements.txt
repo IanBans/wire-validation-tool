@@ -3,4 +3,5 @@ openpyxl==3.0.9
 PySide2==5.15.2
 shiboken2==5.15.2
 shiboken6==6.2.1
-igraph==0.9.8
+decorator==4.4.2
+networkx==2.5.1

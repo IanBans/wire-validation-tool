@@ -1,5 +1,6 @@
 import networkx as nx
 import math
+
 '''
    GraphManager: Class to handle graph operations, reading, writing, traversal
    Fields:
