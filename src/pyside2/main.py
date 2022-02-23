@@ -170,7 +170,7 @@ class App(QMainWindow):
 
                 self.graph.removeCycles()
                 res = self.graph.traverse()
-                self.export.export_to_excel("test.csv", res)
+                self.export.export_to_excel(res)
 
 
         self.wire_report_list.itemClicked.connect(lambda: changeWireReport(self.wire_report_list.currentIndex()))
