@@ -46,7 +46,8 @@ class App(QMainWindow):
 
 
 
-        self.stacked_widget.setMinimumSize(900, 450)
+        self.stacked_widget.setMinimumSize(300, 300)
+        self.stacked_widget.resize(700, 400)
         self.stacked_widget.setWindowTitle('Paccar Wire Validation Tool')
 
         #below code is a placeholder front page that is commented out
@@ -95,12 +96,13 @@ class App(QMainWindow):
 
         file_picker_widgets = QWidget()
         file_picker_layout = QGridLayout()
+        file_picker_layout.setColumnStretch(0, 1)
         file_picker_layout.setRowStretch(0,1)
+        file_picker_layout.setColumnStretch(1, 1)
         next_button = QPushButton('Next')
         pdc_button = QPushButton('Add PDC')
         wire_button = QPushButton('Add Wire Reports')
-        wire_button.setMinimumWidth(400)
-        pdc_button.setMinimumWidth(400)
+
         save = QPushButton("Choose Where to Save ...")
         save.clicked.connect(self.openSaveFileDialog)
 
@@ -137,11 +139,11 @@ class App(QMainWindow):
 
         next_button.clicked.connect(self.setupWireReports)
         next_button.clicked.connect(lambda: self.goToPage('wire_reports'))
-        file_picker_layout.addWidget(next_button, 2, 0, 2, 3)
-        file_picker_layout.addWidget(save, 1, 0, 1, 3)
+        file_picker_layout.addWidget(next_button, 2, 0, 2, 2)
+        file_picker_layout.addWidget(save, 1, 0, 1, 2)
         save.setMaximumWidth(200)
         next_button.setMaximumWidth(200)
-        #file_picker_layout.setSpacing(100)
+
 
     def setupWireReports(self):
         """
@@ -155,7 +157,7 @@ class App(QMainWindow):
                        'To Component',
                        'To Pin',
                        'Wire CSA',
-                       'Description']
+                       'Wire Name']
 
         page = QWidget()
         page_layout = QGridLayout()
@@ -214,7 +216,7 @@ class App(QMainWindow):
         self.wire_report_list.setMinimumWidth(300)
         page_layout.addWidget(self.wire_report_list, 0, 0)
 
-        page_layout.addWidget(fields_selector, 0, 1)
+        page_layout.addWidget(fields_selector, 0, 1, Qt.AlignVCenter)
 
         #demo code to show what might look like to save and load wire harness configurations
 
@@ -231,17 +233,17 @@ class App(QMainWindow):
         checkbox.resize(checkbox.sizeHint())
         line = PySide2.QtWidgets.QLineEdit()
         line.setText("enter the name of this configuration")
+        line.setMaximumWidth(400)
         mini_layout.addWidget(comboBox, 1, 2)
         mini_layout.addWidget(checkbox, 0, 0)
         mini_layout.addWidget(line, 1, 0)
-        page_layout.addLayout(mini_layout, 1, 1)
+        page_layout.addLayout(mini_layout, 1, 0, 1, 2, Qt.AlignHCenter)
         mini_layout.setSpacing(20)
         mini_layout.setMargin(20)
         drawLine = PySide2.QtWidgets.QFrame()
         drawLine.setFrameShape(PySide2.QtWidgets.QFrame.VLine)
         drawLine.setFrameShadow(PySide2.QtWidgets.QFrame.Raised)
         mini_layout.addWidget(drawLine, 0, 1, 3, 1)
-
 
         # create combo boxes and add them to page
         for wire_report in self.wire_report_paths:
@@ -277,7 +279,7 @@ class App(QMainWindow):
         submit.clicked.connect(makeDict)
         submit.clicked.connect(sendReports)
 
-    def createReportLabel(self, path, side):
+    def createReportLabel(self, path, type):
         """
             path: the file the label represents
             side: determine if the label is created for a wire report or pdc
@@ -289,7 +291,7 @@ class App(QMainWindow):
                 removes the the specified label from the view and deletes the path anywhere it was saved
             """
 
-            if side == "wire":
+            if type == "wire":
                 for item in range(self.wire_report_list.count()):
                     if not self.wire_report_list.item(item):
                         continue
@@ -304,10 +306,11 @@ class App(QMainWindow):
 
 
         remove_button = QPushButton("Remove")
+        remove_button.setMaximumWidth(100)
         label = QLabel(path)
         remove_button.clicked.connect(lambda : removeReport(label))
 
-        if side == "wire":
+        if type == "wire":
             self.left_widget_layout.addRow(label,remove_button)
         else:
             self.right_widget_layout.addRow(label, remove_button)
@@ -349,7 +352,8 @@ class App(QMainWindow):
             if file not in self.wire_report_paths:
                 self.createReportLabel(file, "wire")
                 self.wire_report_paths.append(file)
-                self.wire_report_list.addItem(file)
+                self.wire_report_list.addItem(cleanPathName(file))
+
 
 
     def openSaveFileDialog(self):
@@ -381,8 +385,14 @@ def readColumnNames(filename):
             names = list(first_row)
     return names
 
+def cleanPathName(path):
+    i = -1
+    while path[i] != '/' and path[i] != '\\':
+        i = i - 1
+    return path[i + 1:]
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setStyle("Fusion")
     window = App()
     sys.exit(app.exec_())
