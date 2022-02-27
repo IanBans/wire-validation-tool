@@ -9,6 +9,7 @@ from inputparser import InputParser
 from export import ExportManager
 from graphmanager import GraphManager
 
+
 class App(QMainWindow):
     """
        App: the main UI and entry point for the application
@@ -198,11 +199,9 @@ class App(QMainWindow):
             for report in self.parser.getReports():
                 self.graph.addReport(report)
             self.graph.removeCycles()
-            res = self.graph.traverse()
-            self.export.exportToExcel(res)
-            #self.graph.printNodes()
-            #self.graph.printEdges()
-
+            self.export.exportToExcel(self.graph.traverse())
+            self.graph.printNodes()
+            self.graph.printEdges()
         self.wire_report_list.itemClicked.connect(
             lambda: fields_selector.setCurrentIndex(self.wire_report_list.currentIndex().row()))
         page.setLayout(page_layout)

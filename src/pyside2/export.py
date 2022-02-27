@@ -1,5 +1,6 @@
 from openpyxl import Workbook
 
+
 class ExportManager:
     """
         ExportManager: Exports data to an excel worksheet
@@ -38,4 +39,4 @@ class ExportManager:
         for row in rows:
             works.append(row)
         # save workbook
-        workb.save(filename = file_path)
+        workb.save(file_path)

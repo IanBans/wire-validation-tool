@@ -1,5 +1,7 @@
 import math
 import networkx as nx
+
+
 class GraphManager:
     """
         GraphManager: Class to handle graph operations, reading, writing, traversal
@@ -84,7 +86,6 @@ class GraphManager:
             self._g.add_edge(fname, tname, wire=wire_desc, csa=wire_csa)
         print('added ', report.filename, ' to graph')
 
-
     def traverse(self):
         """
             Traces each wire in the graph from the PDC to its endpoint.
@@ -104,7 +105,7 @@ class GraphManager:
         for node in self._g:
             if fuse_rating[node] > 0:
                 for nbr in self._g[node]:
-                    trace = self.rtraverse(node, nbr, node, {'min_csa':math.inf})
+                    trace = self.rtraverse(node, nbr, node, {'min_csa': math.inf})
                     for wire in trace:
                         tuples += [wire]
         return tuples
@@ -135,14 +136,12 @@ class GraphManager:
 
         return output
 
-
     def removeCycles(self):
         """
             Removes all vertices in the graph which are part of a cycle.
         """
         for cycle in nx.cycle_basis(self._g):
             self._g.remove_nodes_from(cycle)
-
 
     def analyzeCycles(self):
         """
