@@ -6,6 +6,7 @@ from PySide2.QtWidgets import QApplication
 from PySide2.QtGui import QFont, Qt
 from openpyxl import load_workbook
 from inputparser import InputParser
+from export import ExportManager
 from graphmanager import GraphManager
 
 
@@ -29,11 +30,11 @@ class App(QMainWindow):
         super().__init__()
         self.parser = InputParser()
         self.graph = GraphManager()
+        self.export = ExportManager()
         self.stacked_widget = QStackedWidget()
         self.wire_report_paths = []
         self.wire_report_list = QListWidget()
         self.pdc_paths = []
-
         self.setupUI()
 
     def setupUI(self):
@@ -195,13 +196,12 @@ class App(QMainWindow):
 
             for _, pdc in self.parser.getPDCs().items():
                 self.graph.addPDC(pdc)
-
             for report in self.parser.getReports():
                 self.graph.addReport(report)
-
+            self.graph.removeCycles()
+            self.export.exportToExcel(self.graph.traverse())
             self.graph.printNodes()
             self.graph.printEdges()
-
         self.wire_report_list.itemClicked.connect(
             lambda: fields_selector.setCurrentIndex(self.wire_report_list.currentIndex().row()))
         page.setLayout(page_layout)
