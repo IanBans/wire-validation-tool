@@ -7,13 +7,6 @@ from PySide2.QtGui import QFont, Qt
 from openpyxl import load_workbook
 from inputparser import InputParser
 from export import ExportManager
-from graphmanager import *
-from PySide2 import QtWidgets, QtUiTools
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
-from PySide2.QtCore import QRect, QFile, QIODevice, QObject
-from openpyxl import Workbook, load_workbook\
 from graphmanager import GraphManager
 
 class App(QMainWindow):
@@ -202,11 +195,13 @@ class App(QMainWindow):
 
             for _, pdc in self.parser.getPDCs().items():
                 self.graph.addPDC(pdc)
-                self.graph.removeCycles()
-                res = self.graph.traverse()
-                self.export.export_to_excel(res)
-            self.graph.printNodes()
-            self.graph.printEdges()
+            for report in self.parser.getReports():
+                self.graph.addReport(report)
+            self.graph.removeCycles()
+            res = self.graph.traverse()
+            self.export.exportToExcel(res)
+            #self.graph.printNodes()
+            #self.graph.printEdges()
 
         self.wire_report_list.itemClicked.connect(
             lambda: fields_selector.setCurrentIndex(self.wire_report_list.currentIndex().row()))

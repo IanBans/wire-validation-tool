@@ -1,40 +1,41 @@
 from openpyxl import Workbook
 
+class ExportManager:
+    """
+        ExportManager: Exports data to an excel worksheet
+        Fields:
+            fpath: the file path to write the worksheet to
+        Methods:
+            setFilePath(file_path): setter for file_path
+            exportToExcel(file_path, rows): writes rows to an excel worksheet
+                at file_path
+    """
 
-def exportToExcel(file_path, rows):
-    """
-        Writes data to an excel file.
-        file_path: Path object designating the worksheet in which
-            the data will be written. Will create the worksheet
-            if it does not exist, and overwrite the data otherwise.
-        rows: 2-dimensional indexed collection (such as a list of lists,
-            or tuple of tuples). Each element in the outer collection will
-            be read as a row to be written to the worksheet.
-    """
-    
     def __init__(self):
         self.fpath = "test.xlsx"
-    # Writes data to an excel file.
-    # file_path: Path object designating the worksheet in which
-    #   the data will be written. Will create the worksheet
-    #   if it does not exist, and overwrite the data otherwise.
-    # rows: 2-dimensional indexed collection (such as a list of lists,
-    #   or tuple of tuples). Each element in the outer collection will
-    #   be read as a row to be written to the worksheet.
-    def export_to_excel(self, rows):
-        # convert Path to string
+
+    def setFilePath(self, file_path):
+        """
+            getter for file path attributes
+        """
+        self.fpath = file_path
+
+    def exportToExcel(self, rows):
+        """
+            Writes data to the excel file in fpath.
+            rows: 2-dimensional indexed collection (such as a list of lists,
+                or tuple of tuples). Each element in the outer collection will
+                be read as a row to be written to the worksheet.
+        """
         file_path = str(self.fpath)
 
-        # initialize workbook
-        wb = Workbook()
-        ws = wb.active
+        # create workbook
+        workb = Workbook()
+        works = workb.active
         first_row = ["From Component | PIN", "To Component | PIN", "Min CSA"]
-        ws.append(first_row)
+        works.append(first_row)
         # write rows
         for row in rows:
-            ws.append(row)
+            works.append(row)
         # save workbook
-        wb.save(filename = file_path)
-
-    def set_file_path(self, file_path):
-        self.fpath = file_path
+        workb.save(filename = file_path)
