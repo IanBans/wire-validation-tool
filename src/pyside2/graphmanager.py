@@ -72,10 +72,16 @@ class GraphManager:
             # get vertex information
             fconn = str(f_tup[0])
             fpin = str(f_tup[1])
-            fname = fconn + "|" + fpin
             tconn = str(t_tup[0])
             tpin = str(t_tup[1])
-            tname = tconn + "|" + tpin
+            if(fconn[0] != 'S'):
+                fname = fconn + "|" + fpin
+            else:
+                fname = fconn
+            if(tconn[0] != 'S'):
+                tname = tconn + "|" + tpin
+            else:
+                tname = tconn
 
             # create vertices that don't exist
             if fname not in self._g:
@@ -96,9 +102,9 @@ class GraphManager:
               min_csa: Float, lowest CSA of any wire segment.
         """
         # check if graph contains cycles
-        if nx.cycle_basis(self._g) != []:
-            print("ERROR: Graph contains cycle")
-            return (-1, -1, -1)
+        #if nx.cycle_basis(self._g) != []:
+        #    print("ERROR: Graph contains cycle")
+        #    return (-1, -1, -1)
         # call rtraverse on all edges leading out of the PDC
         fuse_rating = nx.get_node_attributes(self._g, "fuse_rating")
         tuples = []
@@ -140,7 +146,13 @@ class GraphManager:
         """
             Removes all vertices in the graph which are part of a cycle.
         """
+        pdcs = [x for x,y in self._g.nodes(data=True) if y['fuse_rating']>=0]
         for cycle in nx.cycle_basis(self._g):
+            for node in cycle:
+                if node in pdcs:
+                    print('removing pdc node')
+                    print(cycle)
+            #print(cycle)
             self._g.remove_nodes_from(cycle)
 
     def analyzeCycles(self):
@@ -155,3 +167,15 @@ class GraphManager:
                     count += 1
             output += [count]
         return output
+    def printPdcNodes(self):
+        pdcs =  [x for x,y in self._g.nodes(data=True) if y['fuse_rating']>=0]
+        pdcs.sort()
+        for node in pdcs:
+            print(node, ':', list(nx.bfs_successors(self._g, source=node)))
+
+        print('\n')
+        print(nx.dfs_successors(self._g, source='J051E|2'))
+        print(nx.dfs_successors(self._g, source='J097|4'))
+        print(nx.dfs_successors(self._g, source='J184C|2'))
+        for edge in self._g.edges('J184C|2'):
+            print(edge['Name'])
