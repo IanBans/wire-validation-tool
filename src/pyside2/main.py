@@ -57,7 +57,6 @@ class App(QMainWindow):
         # Qwidget that contains paths of all wire Reports
         self.wire_report_list = QListWidget()
 
-
     # pages so far: "front", "file_picker", "wire_reports"
     def goToPage(self, target):
         if target in self.pages:
@@ -106,7 +105,6 @@ class App(QMainWindow):
         file_picker_layout.addWidget(save, 1, 0, 1, 2)
         save.setMaximumWidth(200)
         next_button.setMaximumWidth(200)
-
 
     def setupWireReports(self):
         """
@@ -232,7 +230,7 @@ class App(QMainWindow):
         fields_selector.setCurrentIndex(0)
 
         back = QPushButton("Back")
-        back.clicked.connect(lambda  : self.goToPage("file_picker"))
+        back.clicked.connect(lambda: self.goToPage("file_picker"))
         page_layout.addWidget(back, 2, 0, 1, 3)
         page_layout.addWidget(submit, 3, 0, 1, 3)
 
@@ -264,17 +262,15 @@ class App(QMainWindow):
                 self.pdc_paths.remove(label.text())
                 self.right_widget_layout.removeRow(label)
 
-
         remove_button = QPushButton("Remove")
         remove_button.setMaximumWidth(100)
         label = QLabel(path)
-        remove_button.clicked.connect(lambda  : removeReport(label))
+        remove_button.clicked.connect(lambda: removeReport(label))
 
         if type == "wire":
             self.left_widget_layout.addRow(label, remove_button)
         else:
             self.right_widget_layout.addRow(label, remove_button)
-
 
     def openCSVFileDialog(self):
         """
@@ -284,15 +280,14 @@ class App(QMainWindow):
         options |= QFileDialog.DontUseNativeDialog
 
         filename, _ = QFileDialog.getOpenFileNames(self,
-                                                    'Choose file',
-                                                    Path.home().as_posix(),
-                                                    'CSV Files (*.csv)',
-                                                    options=options)
+                                                   'Choose file',
+                                                   Path.home().as_posix(),
+                                                   'CSV Files (*.csv)',
+                                                   options=options)
         for file in filename:
             if file not in self.pdc_paths:
                 self.pdc_paths.append(file)
                 self.createReportLabel(file, "pdc")
-
 
     def openExcelFileDialog(self):
         """
@@ -312,7 +307,6 @@ class App(QMainWindow):
                 self.wire_report_paths.append(file)
                 self.wire_report_list.addItem(cleanPathName(file))
 
-
     def openSaveFileDialog(self):
         """
             opens the file picker sorted to .csv files
@@ -324,7 +318,7 @@ class App(QMainWindow):
                                                     "choose file to save",
                                                     Path.home().as_posix())
         # placeholder to not set off pylint
-        fileName = ""
+        fileName = fileName[0]
 
 
 def readColumnNames(filename):
