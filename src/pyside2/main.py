@@ -5,7 +5,7 @@ import PySide2.QtWidgets
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
 from PySide2.QtWidgets import QApplication
-from PySide2.QtGui import QFont, Qt
+from PySide2.QtGui import Qt
 from openpyxl import load_workbook
 from inputparser import InputParser
 from export import ExportManager
