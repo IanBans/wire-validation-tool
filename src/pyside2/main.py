@@ -43,7 +43,8 @@ class App(QMainWindow):
         """
             sets up UI elements and ties them together
         """
-        #the staacked widget is the app container that swaps which widget is shown. Each widget is a page
+        # the staacked widget is the app container that swaps which widget is shown
+        # Each widget is a page
         self.stacked_widget.setMinimumSize(300, 300)
         self.stacked_widget.resize(700, 400)
         self.stacked_widget.setWindowTitle('Paccar Wire Validation Tool')
@@ -53,13 +54,12 @@ class App(QMainWindow):
         self.setupFilePage()
         self.stacked_widget.show()
 
-        #Qwidget that contains paths of all wire Reports
+        # Qwidget that contains paths of all wire Reports
         self.wire_report_list = QListWidget()
 
 
-    #pages so far: "front", "file_picker", "wire_reports"
+    # pages so far: "front", "file_picker", "wire_reports"
     def goToPage(self, target):
-
         if target in self.pages:
             self.stacked_widget.setCurrentWidget(self.pages[target])
 
@@ -72,7 +72,7 @@ class App(QMainWindow):
         file_picker_widgets = QWidget()
         file_picker_layout = QGridLayout()
         file_picker_layout.setColumnStretch(0, 1)
-        file_picker_layout.setRowStretch(0,1)
+        file_picker_layout.setRowStretch(0, 1)
         file_picker_layout.setColumnStretch(1, 1)
         next_button = QPushButton('Next')
         pdc_button = QPushButton('Add PDC')
@@ -100,7 +100,6 @@ class App(QMainWindow):
         self.stacked_widget.addWidget(file_picker_widgets)
         self.pages.update({'file_picker': file_picker_widgets})
 
-
         next_button.clicked.connect(self.setupWireReports)
         next_button.clicked.connect(lambda: self.goToPage('wire_reports'))
         file_picker_layout.addWidget(next_button, 2, 0, 2, 2)
@@ -113,7 +112,6 @@ class App(QMainWindow):
         """
             creates page to customize column fields for each report
         """
-
         def makeDict():
             """
                 create a new dictionary from combobox_dict
@@ -136,7 +134,6 @@ class App(QMainWindow):
                 if path:
                     self.parser.readPDC(path)
 
-
             for path, fields in wire_report_dict.items():
                 from_tuple = (fields[0], fields[1])
                 to_tuple = (fields[2], fields[3])
@@ -155,11 +152,11 @@ class App(QMainWindow):
         # this list contains all the column fields names
         # necessary for reading the input
         fields_list = ['From Component',
-                        'From Pin',
-                        'To Component',
-                        'To Pin',
-                        'Wire CSA',
-                        'Wire Name']
+                       'From Pin',
+                       'To Component',
+                       'To Pin',
+                       'Wire CSA',
+                       'Wire Name']
 
         page = QWidget()
         page_layout = QGridLayout()
@@ -171,7 +168,6 @@ class App(QMainWindow):
         # that contain wire fields
         combo_box_dict = {}
 
-
         self.wire_report_list.itemClicked.connect(
             lambda: fields_selector.setCurrentIndex(self.wire_report_list.currentIndex().row()))
         page.setLayout(page_layout)
@@ -182,7 +178,7 @@ class App(QMainWindow):
 
         page_layout.addWidget(fields_selector, 0, 1, Qt.AlignVCenter)
 
-        #demo code to show what might look like to save and load wire harness configurations
+        # demo code to show what might look like to save and load wire harness configurations
 
         mini_layout = QGridLayout()
         mini_layout.addWidget(PySide2.QtWidgets.QLabel("Or select saved wire report format"), 0, 2)
@@ -236,7 +232,7 @@ class App(QMainWindow):
         fields_selector.setCurrentIndex(0)
 
         back = QPushButton("Back")
-        back.clicked.connect(lambda : self.goToPage("file_picker"))
+        back.clicked.connect(lambda  : self.goToPage("file_picker"))
         page_layout.addWidget(back, 2, 0, 1, 3)
         page_layout.addWidget(submit, 3, 0, 1, 3)
 
@@ -252,7 +248,8 @@ class App(QMainWindow):
 
         def removeReport(label):
             """
-                removes the the specified label from the view and deletes the path anywhere it was saved
+                removes the the specified label from the view and deletes the path
+                anywhere it was saved
             """
 
             if type == "wire":
@@ -268,17 +265,15 @@ class App(QMainWindow):
                 self.right_widget_layout.removeRow(label)
 
 
-
         remove_button = QPushButton("Remove")
         remove_button.setMaximumWidth(100)
         label = QLabel(path)
-        remove_button.clicked.connect(lambda : removeReport(label))
+        remove_button.clicked.connect(lambda  : removeReport(label))
 
         if type == "wire":
-            self.left_widget_layout.addRow(label,remove_button)
+            self.left_widget_layout.addRow(label, remove_button)
         else:
             self.right_widget_layout.addRow(label, remove_button)
-
 
 
     def openCSVFileDialog(self):
@@ -306,10 +301,10 @@ class App(QMainWindow):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         filename, _ = QFileDialog.getOpenFileNames(self,
-                                                  'Choose file',
-                                                  Path.home().as_posix(),
-                                                  'Excel Files (*.xlsx)',
-                                                  options=options)
+                                                   'Choose file',
+                                                   Path.home().as_posix(),
+                                                   'Excel Files (*.xlsx)',
+                                                   options=options)
 
         for file in filename:
             if file not in self.wire_report_paths:
@@ -328,7 +323,9 @@ class App(QMainWindow):
         fileName = QFileDialog.getExistingDirectory(self,
                                                     "choose file to save",
                                                     Path.home().as_posix())
-        #do something with save path
+        # placeholder to not set off pylint
+        fileName = ""
+
 
 def readColumnNames(filename):
     """
