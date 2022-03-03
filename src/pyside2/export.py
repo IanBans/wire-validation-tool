@@ -1,27 +1,42 @@
 from openpyxl import Workbook
 
 
-def exportToExcel(file_path, rows):
+class ExportManager:
     """
-        Writes data to an excel file.
-        file_path: Path object designating the worksheet in which
-            the data will be written. Will create the worksheet
-            if it does not exist, and overwrite the data otherwise.
-        rows: 2-dimensional indexed collection (such as a list of lists,
-            or tuple of tuples). Each element in the outer collection will
-            be read as a row to be written to the worksheet.
+        ExportManager: Exports data to an excel worksheet
+        Fields:
+            fpath: the file path to write the worksheet to
+        Methods:
+            setFilePath(file_path): setter for file_path
+            exportToExcel(file_path, rows): writes rows to an excel worksheet
+                at file_path
     """
 
-    # convert Path to string
-    file_path = str(file_path)
+    def __init__(self):
+        self.fpath = "test.xlsx"
 
-    # initialize workbook
-    workb = Workbook()
-    works = workb.active
+    def setFilePath(self, file_path):
+        """
+            getter for file path attributes
+        """
+        self.fpath = file_path
 
-    # write rows
-    for row in rows:
-        works.append(row)
+    def exportToExcel(self, rows):
+        """
+            Writes data to the excel file in fpath.
+            rows: 2-dimensional indexed collection (such as a list of lists,
+                or tuple of tuples). Each element in the outer collection will
+                be read as a row to be written to the worksheet.
+        """
+        file_path = str(self.fpath)
 
-    # save workbook
-    workb.save(filename=file_path)
+        # create workbook
+        workb = Workbook()
+        works = workb.active
+        first_row = ["From Component | PIN", "To Component | PIN", "Min CSA"]
+        works.append(first_row)
+        # write rows
+        for row in rows:
+            works.append(row)
+        # save workbook
+        workb.save(file_path)

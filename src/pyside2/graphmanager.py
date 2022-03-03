@@ -1,3 +1,4 @@
+import math
 import networkx as nx
 
 
@@ -81,8 +82,76 @@ class GraphManager:
                 self._g.add_node(fname, connector=fconn, pin=fpin, fuse_rating=-1)
             if tname not in self._g:
                 self._g.add_node(tname, connector=tconn, pin=tpin, fuse_rating=-1)
-
             # create wire between the two components
             self._g.add_edge(fname, tname, wire=wire_desc, csa=wire_csa)
-
         print('added ', report.filename, ' to graph')
+
+    def traverse(self):
+        """
+            Traces each wire in the graph from the PDC to its endpoint.
+            Returns a list of 3-tuples, where each tuple represents a wire.
+            The first element is the name of the start vertex.
+            The second element is the name of the end vertex.
+            The third element is a dictionary containing the following keys:
+              min_csa: Float, lowest CSA of any wire segment.
+        """
+        # check if graph contains cycles
+        if nx.cycle_basis(self._g) != []:
+            print("ERROR: Graph contains cycle")
+            return (-1, -1, -1)
+        # call rtraverse on all edges leading out of the PDC
+        fuse_rating = nx.get_node_attributes(self._g, "fuse_rating")
+        tuples = []
+        for node in self._g:
+            if fuse_rating[node] > 0:
+                for nbr in self._g[node]:
+                    trace = self.rtraverse(node, nbr, node, {'min_csa': math.inf})
+                    for wire in trace:
+                        tuples += [wire]
+        return tuples
+
+    def rtraverse(self, startnode, currnode, lastnode, data):
+        """
+            Recursive subroutine of traverse(). Should not be called directly.
+                startnode: The first node in the wire.
+                currnode: The node added by the calling method.
+                lastnode: The node added prior to currnode.
+                data: Dictionary of information to report.
+            Key structure is in the comment for traverse().
+            TODO: Add loop handling without loop removal.
+        """
+        output = []
+        # update data with wire from lastnode to currnode
+        if self._g[lastnode][currnode]["csa"] < data["min_csa"]:
+            data["min_csa"] = self._g[lastnode][currnode]["csa"]
+        # recursively traverse to all neighbors other than lastnode
+        for nbr in self._g[currnode]:
+            if nbr != lastnode:
+                trace = self.rtraverse(startnode, nbr, currnode, data)
+                for wire in trace:
+                    output += [wire]
+        # check if this is the end of the wire
+        if output == []:
+            output = [(startnode, currnode, data["min_csa"])]
+
+        return output
+
+    def removeCycles(self):
+        """
+            Removes all vertices in the graph which are part of a cycle.
+        """
+        for cycle in nx.cycle_basis(self._g):
+            self._g.remove_nodes_from(cycle)
+
+    def analyzeCycles(self):
+        """
+            finds the number of junctions connecting the cycle to the rest of the graph.
+        """
+        output = []
+        for cycle in nx.cycle_basis(self._g):
+            count = 0
+            for node in cycle:
+                if len(self._g[node]) > 2:
+                    count += 1
+            output += [count]
+        return output
