@@ -5,7 +5,7 @@ import PySide2.QtWidgets
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
 from PySide2.QtWidgets import QApplication
-from PySide2.QtGui import Qt
+from PySide2.QtGui import Qt, QPalette, QColor, QBrush
 from openpyxl import load_workbook
 from inputparser import InputParser
 from export import ExportManager
@@ -30,12 +30,11 @@ class App(QMainWindow):
     # sets up UI and create parser and GraphManager instances
     def __init__(self):
         super().__init__()
-        self.parser = InputParser()
-        self.graph = GraphManager()
-        self.export = ExportManager()
+        self.parser = InputParser(self)
+        self.graph = GraphManager(self)
+        self.export = ExportManager(self)
         self.stacked_widget = QStackedWidget()
         self.wire_report_paths = []
-        self.wire_report_list = QListWidget()
         self.pdc_paths = []
         self.setupUI()
 
@@ -45,7 +44,7 @@ class App(QMainWindow):
         """
         # the staacked widget is the app container that swaps which widget is shown
         # Each widget is a page
-        self.stacked_widget.setMinimumSize(300, 300)
+        self.stacked_widget.setMinimumSize(500, 300)
         self.stacked_widget.resize(700, 400)
         self.stacked_widget.setWindowTitle('Paccar Wire Validation Tool')
         # self.pages collects all created pages for navigation
@@ -57,7 +56,7 @@ class App(QMainWindow):
         # Qwidget that contains paths of all wire Reports
         self.wire_report_list = QListWidget()
 
-    # pages so far: "front", "file_picker", "wire_reports"
+    # pages so far: "front", "file_picker", "wire_reports", "follow_up"
     def goToPage(self, target):
         if target in self.pages:
             self.stacked_widget.setCurrentWidget(self.pages[target])
@@ -84,6 +83,8 @@ class App(QMainWindow):
 
         self.left_widget_layout = QFormLayout()
         self.right_widget_layout = QFormLayout()
+        self.left_widget_layout.setFormAlignment(Qt.AlignHCenter)
+        self.right_widget_layout.setFormAlignment(Qt.AlignHCenter)
         file_picker_layout.addLayout(self.left_widget_layout, 0, 0)
         file_picker_layout.addLayout(self.right_widget_layout, 0, 1)
 
@@ -105,6 +106,13 @@ class App(QMainWindow):
         file_picker_layout.addWidget(save, 1, 0, 1, 2)
         save.setMaximumWidth(200)
         next_button.setMaximumWidth(200)
+        home = QPushButton("Home")
+        home.clicked.connect(lambda: self.goToPage("file_picker"))
+        home.setMinimumWidth(150)
+        home_color = QPalette(QApplication.palette())
+        home_color.setBrush(QPalette.Button, QBrush(QColor(165, 214, 255)))
+        home.setPalette(home_color)
+        file_picker_layout.addWidget(home, 2, 1, Qt.AlignRight)
 
     def setupWireReports(self):
         """
@@ -171,15 +179,14 @@ class App(QMainWindow):
         page.setLayout(page_layout)
         self.stacked_widget.addWidget(page)
         self.pages.update({'wire_reports': page})
-        self.wire_report_list.setMinimumWidth(300)
         page_layout.addWidget(self.wire_report_list, 0, 0)
 
         page_layout.addWidget(fields_selector, 0, 1, Qt.AlignVCenter)
 
         # demo code to show what might look like to save and load wire harness configurations
 
-        mini_layout = QGridLayout()
-        mini_layout.addWidget(PySide2.QtWidgets.QLabel("Or select saved wire report format"), 0, 2)
+        format_selector = QGridLayout()
+        format_selector.addWidget(PySide2.QtWidgets.QLabel("Or select saved wire report format"), 0, 2)
         comboBox = QComboBox()
         comboBox.addItem("Choose Option")
         comboBox.addItem("Roof")
@@ -188,20 +195,21 @@ class App(QMainWindow):
         comboBox.addItem("Engine")
         checkbox = PySide2.QtWidgets.QCheckBox()
         checkbox.setText("click here to save the above configuration for future use")
-        checkbox.resize(checkbox.sizeHint())
+        checkbox.adjustSize()
         line = PySide2.QtWidgets.QLineEdit()
         line.setText("enter the name of this configuration")
         line.setMaximumWidth(400)
-        mini_layout.addWidget(comboBox, 1, 2)
-        mini_layout.addWidget(checkbox, 0, 0)
-        mini_layout.addWidget(line, 1, 0)
-        page_layout.addLayout(mini_layout, 1, 0, 1, 2, Qt.AlignHCenter)
-        mini_layout.setSpacing(20)
-        mini_layout.setMargin(20)
+        line.adjustSize()
+        format_selector.addWidget(comboBox, 1, 2)
+        format_selector.addWidget(checkbox, 0, 0)
+        format_selector.addWidget(line, 1, 0)
+        page_layout.addLayout(format_selector, 1, 0, 1, 2, Qt.AlignHCenter)
+        format_selector.setSpacing(20)
+        format_selector.setMargin(20)
         drawLine = PySide2.QtWidgets.QFrame()
         drawLine.setFrameShape(PySide2.QtWidgets.QFrame.VLine)
         drawLine.setFrameShadow(PySide2.QtWidgets.QFrame.Raised)
-        mini_layout.addWidget(drawLine, 0, 1, 3, 1)
+        format_selector.addWidget(drawLine, 0, 1, 3, 1)
 
         # create combo boxes and add them to page
         for wire_report in self.wire_report_paths:
@@ -231,11 +239,31 @@ class App(QMainWindow):
 
         back = QPushButton("Back")
         back.clicked.connect(lambda: self.goToPage("file_picker"))
-        page_layout.addWidget(back, 2, 0, 1, 3)
-        page_layout.addWidget(submit, 3, 0, 1, 3)
+        home = QPushButton("Home")
+        home.clicked.connect(lambda: self.goToPage("file_picker"))
+        home.setMinimumWidth(150)
+        home_color = QPalette(QApplication.palette())
+        home_color.setBrush(QPalette.Button, QBrush(QColor(165, 214, 255)))
+        home.setPalette(home_color)
+        page_layout.addWidget(home, 3, 1, Qt.AlignRight)
+        page_layout.addWidget(back, 2, 0, 1, 1)
+        page_layout.addWidget(submit, 3, 0, 1, 1)
 
         submit.clicked.connect(makeDict)
         submit.clicked.connect(sendReports)
+        # create page to give feedback after submitting files
+        # submit.clicked.connect(self.setupFollowUpPage)
+        # submit.clicked.connect(lambda: self.goToPage("follow_up"))
+
+
+    # def setupFollowUpPage(self):
+    #     follow_up = QWidget()
+    #     self.pages.update({"follow_up" : follow_up})
+    #     self.stacked_widget.addWidget(follow_up)
+    #     layout = QGridLayout()
+    #     follow_up.setLayout(layout)
+
+
 
     def createReportLabel(self, path, type):
         """
@@ -320,6 +348,12 @@ class App(QMainWindow):
         # placeholder to not set off pylint
         fileName = fileName[0]
 
+    def reportError(self, error_code):
+        """
+        error_code: specifies what type of error recieved
+        used by other modules to report errors encountered
+        """
+        print(error_code)
 
 def readColumnNames(filename):
     """
@@ -343,7 +377,6 @@ def cleanPathName(path):
     while path[i] != '/' and path[i] != '\\':
         i = i - 1
     return path[i + 1:]
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
