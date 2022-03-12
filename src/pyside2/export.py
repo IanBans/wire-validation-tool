@@ -17,7 +17,7 @@ class ExportManager:
 
     def setFilePath(self, file_path):
         """
-            getter for file path attributes
+            setter for file path attributes
         """
         self.fpath = file_path
 
@@ -33,7 +33,7 @@ class ExportManager:
         # create workbook
         workb = Workbook()
         works = workb.active
-        first_row = ["From Component | PIN", "To Component | PIN", "Min CSA"]
+        first_row = ["Starting Component | PIN", "Ending Component | PIN", "Min CSA", "Wires", "Splices"]
         works.append(first_row)
         # write rows
         for row in rows:
