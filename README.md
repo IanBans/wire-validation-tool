@@ -26,6 +26,8 @@ The operating environment for the application shall be a desktop application for
 The initial release of this program will read in a bill of materials for a set of wiring harnesses and trace the wires present.
 The list of wires will be output in a table containing information about the wire, and possibly indicating error conditions.
 
-<h2>Subsequent additions to this program may allow wire lengths to be read in by image recognition software, and may check for more complex error conditions.</h2>
+<h2>Scope of Subsequent Releases</h2>
+Subsequent additions to this program may allow wire lengths to be read in by image recognition software, and may check for more complex error conditions.
 
 <h2>Limitations and Exclusions</h2>
+This program will not be able to design, edit, or visually display wiring harness schematics.
