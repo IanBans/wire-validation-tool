@@ -101,11 +101,6 @@ class GraphManager:
             The third element is a dictionary containing the following keys:
               min_csa: Float, lowest CSA of any wire segment.
         """
-        # check if graph contains cycles
-        #if nx.cycle_basis(self._g) != []:
-        #    print("ERROR: Graph contains cycle")
-        #    return (-1, -1, -1)
-        # call rtraverse on all edges leading out of the PDC
         fuse_rating = nx.get_node_attributes(self._g, "fuse_rating")
         tuples = []
         for node in self._g:

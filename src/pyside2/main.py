@@ -199,9 +199,8 @@ class App(QMainWindow):
             for report in self.parser.getReports():
                 self.graph.addReport(report)
             self.graph.removeCycles()
-            self.export.exportToExcel(self.graph.traverse())
-            self.graph.printNodes()
-            self.graph.printEdges()
+            self.export.setFilePath("C:\\Users\\Ian\\demo\\demo_output.xlsx")
+            self.export.exportToExcel(self.graph.spliceTraverse('bfs'))
         self.wire_report_list.itemClicked.connect(
             lambda: fields_selector.setCurrentIndex(self.wire_report_list.currentIndex().row()))
         page.setLayout(page_layout)

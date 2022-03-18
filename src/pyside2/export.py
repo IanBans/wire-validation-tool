@@ -1,4 +1,6 @@
 from openpyxl import Workbook
+from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
+from openpyxl.utils import get_column_letter
 
 
 class ExportManager:
@@ -13,7 +15,7 @@ class ExportManager:
     """
 
     def __init__(self):
-        self.fpath = "test.xlsx"
+        self.fpath = "output.xlsx"
 
     def setFilePath(self, file_path):
         """
@@ -33,10 +35,17 @@ class ExportManager:
         # create workbook
         workb = Workbook()
         works = workb.active
-        first_row = ["Starting Component | PIN", "Ending Component | PIN", "Min CSA", "Wires", "Splices"]
+
+        first_row = ["Starting Component | PIN", "Ending Component | PIN", "Minimum CSA", "Wires", "Splice(s)"]
         works.append(first_row)
         # write rows
         for row in rows:
             works.append(row)
         # save workbook
+        dim_holder = DimensionHolder(worksheet=works)
+
+        for col in range(works.min_column, works.max_column + 1):
+            dim_holder[get_column_letter(col)] = ColumnDimension(works, min=col, max=col, width=25)
+
+        works.column_dimensions = dim_holder
         workb.save(file_path)
