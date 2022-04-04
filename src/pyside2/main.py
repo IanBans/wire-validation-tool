@@ -255,14 +255,12 @@ class App(QMainWindow):
         # submit.clicked.connect(self.setupFollowUpPage)
         # submit.clicked.connect(lambda: self.goToPage("follow_up"))
 
-
     # def setupFollowUpPage(self):
     #     follow_up = QWidget()
     #     self.pages.update({"follow_up" : follow_up})
     #     self.stacked_widget.addWidget(follow_up)
     #     layout = QGridLayout()
     #     follow_up.setLayout(layout)
-
 
 
     def createReportLabel(self, path, type):
@@ -355,6 +353,7 @@ class App(QMainWindow):
         """
         print(error_code)
 
+
 def readColumnNames(filename):
     """
         filename: full file path of report file
@@ -377,6 +376,7 @@ def cleanPathName(path):
     while path[i] != '/' and path[i] != '\\':
         i = i - 1
     return path[i + 1:]
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
