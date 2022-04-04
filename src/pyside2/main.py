@@ -372,6 +372,10 @@ def readColumnNames(filename):
 
 
 def cleanPathName(path):
+    """
+        path: a string conatining the full path to a file
+        This helper method returns a new string by striping a path name so that only the file name remains
+    """
     i = -1
     while path[i] != '/' and path[i] != '\\':
         i = i - 1
@@ -383,3 +387,4 @@ if __name__ == '__main__':
     app.setStyle("Fusion")
     window = App()
     sys.exit(app.exec_())
+
