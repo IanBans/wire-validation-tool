@@ -212,10 +212,10 @@ class App(QMainWindow):
         page_layout.addLayout(format_selector, 1, 0, 1, 2, Qt.AlignHCenter)
         format_selector.setSpacing(20)
         format_selector.setMargin(20)
-        drawLine = PySide2.QtWidgets.QFrame()
-        drawLine.setFrameShape(PySide2.QtWidgets.QFrame.VLine)
-        drawLine.setFrameShadow(PySide2.QtWidgets.QFrame.Raised)
-        format_selector.addWidget(drawLine, 0, 1, 3, 1)
+        draw_line = PySide2.QtWidgets.QFrame()
+        draw_line.setFrameShape(PySide2.QtWidgets.QFrame.VLine)
+        draw_line.setFrameShadow(PySide2.QtWidgets.QFrame.Raised)
+        format_selector.addWidget(draw_line, 0, 1, 3, 1)
 
         # create combo boxes and add them to page
         for wire_report in self.wire_report_paths:
@@ -352,12 +352,12 @@ class App(QMainWindow):
         # placeholder to not set off pylint
         filename = filename[0]
 
-def reportError(self, error_code):
-    """
-    error_code: specifies what type of error recieved
-    used by other modules to report errors encountered
-    """
-    print(error_code)
+    def reportError(error_code):
+        """
+        error_code: specifies what type of error recieved
+        used by other modules to report errors encountered
+        """
+        print(error_code)
 
 
 def readColumnNames(filename):
@@ -392,4 +392,3 @@ if __name__ == '__main__':
     app.setStyle("Fusion")
     window = App()
     sys.exit(app.exec_())
-

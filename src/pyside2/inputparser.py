@@ -75,4 +75,3 @@ class InputParser:
         report = Report(filename, from_labels, to_labels, csa, desc, self.gui)
         self._reports.append(report)
         return report
-
