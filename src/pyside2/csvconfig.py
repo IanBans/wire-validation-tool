@@ -78,7 +78,7 @@ class CsvConfig:
         """
             new_row: list representing one of the csv rows that will be inserted into the csv file
             This method appends the new_row into the wire report csv configuration file
-            If the new row shares a name with an existing row the exisiting row will first be deleted
+            If the new row shares a name with an existing row the exisiting row will overwritten
             Returns 0 on failure and 1 on success
 
         """

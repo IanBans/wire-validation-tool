@@ -4,7 +4,7 @@ from pathlib import Path
 import PySide2.QtWidgets
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
-from PySide2.QtWidgets import QApplication
+from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QCheckBox
 from PySide2.QtGui import Qt, QPalette, QColor, QBrush
 from openpyxl import load_workbook
 from inputparser import InputParser
@@ -193,12 +193,12 @@ class App(QMainWindow):
         format_selector = QGridLayout()
         format_selector.addWidget(PySide2.QtWidgets.QLabel("Or select saved wire report format")
                                                             , 0, 2)
-        comboBox = QComboBox()
-        comboBox.addItem("Choose Option")
-        comboBox.addItem("Roof")
-        comboBox.addItem("wire_report_1231424")
-        comboBox.addItem("wire_report_243862")
-        comboBox.addItem("Engine")
+        combo_box = QComboBox()
+        combo_box.addItem("Choose Option")
+        combo_box.addItem("Roof")
+        combo_box.addItem("wire_report_1231424")
+        combo_box.addItem("wire_report_243862")
+        combo_box.addItem("Engine")
         checkbox = PySide2.QtWidgets.QCheckBox()
         checkbox.setText("click here to save the above configuration for future use")
         checkbox.adjustSize()
@@ -206,7 +206,7 @@ class App(QMainWindow):
         line.setText("enter the name of this configuration")
         line.setMaximumWidth(400)
         line.adjustSize()
-        format_selector.addWidget(comboBox, 1, 2)
+        format_selector.addWidget(combo_box, 1, 2)
         format_selector.addWidget(checkbox, 0, 0)
         format_selector.addWidget(line, 1, 0)
         page_layout.addLayout(format_selector, 1, 0, 1, 2, Qt.AlignHCenter)
@@ -269,7 +269,7 @@ class App(QMainWindow):
     #     follow_up.setLayout(layout)
 
 
-    def createReportLabel(self, path, type):
+    def createReportLabel(self, path, side):
         """
             path: the file the label represents
             side: determine if the label is created for a wire report or pdc
@@ -282,7 +282,7 @@ class App(QMainWindow):
                 anywhere it was saved
             """
 
-            if type == "wire":
+            if side == "wire":
                 for item in range(self.wire_report_list.count()):
                     if not self.wire_report_list.item(item):
                         continue
@@ -299,7 +299,7 @@ class App(QMainWindow):
         label = QLabel(path)
         remove_button.clicked.connect(lambda: removeReport(label))
 
-        if type == "wire":
+        if side == "wire":
             self.left_widget_layout.addRow(label, remove_button)
         else:
             self.right_widget_layout.addRow(label, remove_button)
@@ -352,7 +352,7 @@ class App(QMainWindow):
         # placeholder to not set off pylint
         filename = filename[0]
 
-    def reportError(error_code):
+    def reportError(self, error_code):
         """
         error_code: specifies what type of error recieved
         used by other modules to report errors encountered

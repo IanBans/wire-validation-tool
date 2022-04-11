@@ -156,4 +156,3 @@ class GraphManager:
                     count += 1
             output += [count]
         return output
-
