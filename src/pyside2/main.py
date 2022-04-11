@@ -10,6 +10,7 @@ from openpyxl import load_workbook
 from inputparser import InputParser
 from export import ExportManager
 from graphmanager import GraphManager
+from csvconfig import CsvConfig
 
 
 class App(QMainWindow):
@@ -56,8 +57,12 @@ class App(QMainWindow):
         # Qwidget that contains paths of all wire Reports
         self.wire_report_list = QListWidget()
 
-    # pages so far: "front", "file_picker", "wire_reports", "follow_up"
+
     def goToPage(self, target):
+        """
+            target: string representation of the new page the user wants to display
+            Changes the visible widget (the current viewable page) shown in the stacked widget
+        """
         if target in self.pages:
             self.stacked_widget.setCurrentWidget(self.pages[target])
 
@@ -186,7 +191,8 @@ class App(QMainWindow):
         # demo code to show what might look like to save and load wire harness configurations
 
         format_selector = QGridLayout()
-        format_selector.addWidget(PySide2.QtWidgets.QLabel("Or select saved wire report format"), 0, 2)
+        format_selector.addWidget(PySide2.QtWidgets.QLabel("Or select saved wire report format")
+                                                            , 0, 2)
         comboBox = QComboBox()
         comboBox.addItem("Choose Option")
         comboBox.addItem("Roof")
@@ -340,18 +346,18 @@ class App(QMainWindow):
         """
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName = QFileDialog.getExistingDirectory(self,
+        filename = QFileDialog.getExistingDirectory(self,
                                                     "choose file to save",
                                                     Path.home().as_posix())
         # placeholder to not set off pylint
-        fileName = fileName[0]
+        filename = filename[0]
 
-    def reportError(self, error_code):
-        """
-        error_code: specifies what type of error recieved
-        used by other modules to report errors encountered
-        """
-        print(error_code)
+def reportError(self, error_code):
+    """
+    error_code: specifies what type of error recieved
+    used by other modules to report errors encountered
+    """
+    print(error_code)
 
 
 def readColumnNames(filename):
@@ -374,13 +380,12 @@ def readColumnNames(filename):
 def cleanPathName(path):
     """
         path: a string conatining the full path to a file
-        This helper method returns a new string by striping a path name so that only the file name remains
+        Returns a new string by striping a path name so that only the file name remains
     """
     i = -1
     while path[i] != '/' and path[i] != '\\':
         i = i - 1
     return path[i + 1:]
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

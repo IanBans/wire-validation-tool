@@ -33,19 +33,18 @@ class CsvConfig:
             This method searches the csv file for the row that begins with the given name
             returns a list representing the csv row where each entry is a string object
         """
-        file = open("test.txt", "r")
-        reader = csv.reader(file)
-        target_row = []
-        for row in reader:
-            if not row:
-                continue
-            # ignore lines starting with '#'
-            if row[0][0] == '#':
-                continue
-            if row[0] == name:
-                target_row = row
-                break
-        file.close()
+        with open("test.txt", "r") as file:
+            reader = csv.reader(file)
+            target_row = []
+            for row in reader:
+                if not row:
+                    continue
+                # ignore lines starting with '#'
+                if row[0][0] == '#':
+                    continue
+                if row[0] == name:
+                    target_row = row
+                    break
         return target_row
 
     def delete(self, name):
@@ -56,20 +55,18 @@ class CsvConfig:
         """
         try:
             # first record orginal contents of text file but exclude the target row
-            file = open("test.txt", "r+")
-            reader = csv.reader(file)
-            new_csv = []
-            for row in reader:
-                if not row:
-                    continue
-                if row[0] != name:
-                    new_csv.append(row)
-            file.close()
+            with open("test.txt", "r+") as file:
+                reader = csv.reader(file)
+                new_csv = []
+                for row in reader:
+                    if not row:
+                        continue
+                    if row[0] != name:
+                        new_csv.append(row)
             # write new contents to the same file
-            file = open("test.txt", "w+", newline='')
-            writer = csv.writer(file)
-            writer.writerows(new_csv)
-            file.close()
+            with open("test.txt", "w+", newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows(new_csv)
         except:
             print("error deleting entry")
             return 0
@@ -87,27 +84,27 @@ class CsvConfig:
             # overwting an exisiting row
             if self.search(new_row[0]):
                 # Record contents of file except the row to be overwritten
-                file = open("test.txt", "r+")
-                reader = csv.reader(file)
-                new_csv = []
-                for row in reader:
-                    if not row:
-                        continue
-                    if row[0] != new_row[0]:
-                        new_csv.append(row)
-                file.close()
-                # write new contents to the same file
-                file = open("test.txt", "w+", newline='')
-                writer = csv.writer(file)
-                writer.writerows(new_csv)
-                writer.writerow(new_row)
-                file.close()
+                with open("test.txt", "r+") as file:
+                    reader = csv.reader(file)
+                    new_csv = []
+                    for row in reader:
+                        if not row:
+                            continue
+                        if row[0] != new_row[0]:
+                            new_csv.append(row)
+                    file.close()
+                    # write new contents to the same file
+                    file = open("test.txt", "w+", newline='')
+                    writer = csv.writer(file)
+                    writer.writerows(new_csv)
+                    writer.writerow(new_row)
+
             # Appending new row
             else:
-                file = open("test.txt", "a", newline="")
-                writer = csv.writer(file)
-                writer.writerow(new_row)
-                file.close()
+                with open("test.txt", "a", newline="") as file:
+                    writer = csv.writer(file)
+                    writer.writerow(new_row)
+
             return 1
         except:
             print("failure adding new row")
@@ -118,15 +115,14 @@ class CsvConfig:
             creates a list "names" of all the name fields for each data entry in the CSV and returns the list
         """
         names = []
-        file = open("test.txt", "r")
-        reader = csv.reader(file)
-        for row in reader:
-            if not row:
-                continue
-            # ignore lines starting with '#' and the row depicting the csv row format
-            if row[0][0] == '#' or row[0] == "name":
-                continue
-            names.append(row[0])
-        file.close()
+        with open("test.txt", "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if not row:
+                    continue
+                # ignore lines starting with '#' and the row depicting the csv row format
+                if row[0][0] == '#' or row[0] == "name":
+                    continue
+                names.append(row[0])
         return names
 
