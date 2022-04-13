@@ -74,11 +74,11 @@ class GraphManager:
             fpin = str(f_tup[1])
             tconn = str(t_tup[0])
             tpin = str(t_tup[1])
-            if(fconn[0] != 'S'):
+            if fconn[0] != 'S':
                 fname = fconn + "|" + fpin
             else:
                 fname = fconn
-            if(tconn[0] != 'S'):
+            if tconn[0] != 'S':
                 tname = tconn + "|" + tpin
             else:
                 tname = tconn
@@ -137,82 +137,89 @@ class GraphManager:
 
         return output
 
-    def removeCycles(self):
+    def reportCycle(self, pdc):
         """
-            Removes all vertices in the graph which are part of a cycle.
-        """
-        pdcs = [x for x,y in self._g.nodes(data=True) if y['fuse_rating']>=0]
-        for cycle in nx.cycle_basis(self._g):
-            output = []
-            for node in cycle:
-                if node in pdcs:
-                    print('removing pdc node')
-                    print(cycle)
-            self._g.remove_nodes_from(cycle)
-
-    def analyzeCycles(self):
-        """
-            finds the number of junctions connecting the cycle to the rest of the graph.
-            testing helper function. remove on release
-        """
-        pdcs =  [x for x,y in self._g.nodes(data=True) if y['fuse_rating']>=0]
-        output = []
-        for cycle in nx.cycle_basis(self._g):
-            count = 0
-            if(cycle in pdcs):
-                print(cycle)
-            for node in cycle:
-                if len(self._g[node]) > 2:
-                    count += 1
-            output += [count]
-        return output
-
-    def spliceTraverse(self, traversal='dfs'):
-        '''
             Arguments:
-                traversal: specify either 'dfs' or 'bfs' to use
-                either search type. Default depth first, otherwise bfs
+                pdc: node in the graph to check for cycle
+            checks for a cycle within the graph from 'pdc' source.
+            if one exists, gets minimum CSA, wires, and splice points.
+            returns False if no cycle, or output tuple with cycle information.
+            output format:
+            (startComponent|startPin, endComponent|endPin, min_csa, wire1, wire2, ..., wire_n,
+            splice1, splice2, etc)
+        """
+        min_csa = math.inf
+        wires = set()
+        splice_list = []
+        try:
+            loop = dict(nx.find_cycle(self._g, source=pdc))
+        except nx.exception.NetworkXNoCycle:
+            return False
+        else:
+            loop_start = list(loop)[0]
+            enum = loop.items()
+            for start, end in enum:
+                # each wire, update the minimum CSA and add to
+                # the wires list
+                curr_csa = self._g[start][end]['csa']
+                wname = self._g[start][end]['wire']
+                if wname not in wires:
+                    wires.add(wname)
+                    if curr_csa < min_csa:
+                        min_csa = curr_csa
+                    if end[0] == 'S':
+                        splice_list.append(end)
+            return (loop_start, loop_start, min_csa, ', '.join(wires), ', '.join(splice_list))
+
+
+    def spliceTraverse(self):
+        '''
+
             Traces each wire in the pdc to it's endpoint(s).
             Outputs the start and end component/pin, each wire, and the
             minimum CSA of all wires in the path
-            Currently doesn't handle loops in data.
             output format:
             (startComponent|startPin, endComponent|endPin, min_csa, wire1, wire2, ..., wire_n,
             splice1, splice2, etc)
         '''
         output = []
-        # get all the pdcs into a list
-        pdcs =  [x for x,y in self._g.nodes(data=True) if y['fuse_rating']>=0]
+        # gather all the pdcs into a list
+        pdcs = [x for x, y in self._g.nodes(data=True) if y['fuse_rating'] >= 0]
         # start the path at the first PDC, and initialize the dictionary
         for pdc in pdcs:
             path = {}
             path['start'] = pdc
             path['min_csa'] = math.inf
-            path['wires'] = []
+            path['wires'] = set()
             path['splice'] = set()
-            if(traversal == 'dfs'):
-                search = nx.dfs_successors(self._g, source=pdc)
+            loop = self.reportCycle(pdc)
+            if loop:
+                output.append(loop)
             else:
                 search = dict(nx.bfs_successors(self._g, source=pdc))
-            if bool(search):
-                for start, ends in search.items():
-                    # each wire, update the minimum CSA and add to
-                    # the wires list
-                    for end in ends:
-                        curr_csa = self._g[start][end]['csa']
-                        wname = self._g[start][end]['wire']
-                        path['wires'].append(wname)
-                        if curr_csa < path['min_csa']:
-                            path['min_csa'] = curr_csa
-                        # when the wire is not in the list of traversed nodes, its an endpoint
-                        # or a loop
-                        if end not in set(search.keys()):
-                            path['end'] = end
-                            if start[0] == 'S' :
-                              path['splice'].add(start)
-                            spliceList = list(path['splice'])
-                            output.append((path['start'], path['end'], path['min_csa'],
-                                           ', '.join(path['wires']), ', '.join(list(path['splice']))))
+
+                if bool(search):
+                    for start, ends in search.items():
+                        # each wire, update the minimum CSA and add to
+                        # the wires list
+                        for end in ends:
+                            curr_csa = self._g[start][end]['csa']
+                            wname = self._g[start][end]['wire']
+                            if wname not in path['wires']:
+                                path['wires'].add(wname)
+                                if curr_csa < path['min_csa']:
+                                    path['min_csa'] = curr_csa
+                                # when the wire is not in the list of traversed nodes, it's an endpoint
+                                # or a loop
+                                if end not in set(search.keys()):
+                                    path['end'] = end
+                                    if start[0] == 'S':
+                                        path['splice'].add(start)
+                                        search = dict(nx.bfs_successors(self._g, source=start))
+
+                                    splice_list = list(path['splice'])
+                                    output.append((path['start'], path['end'], path['min_csa'],
+                                                   ', '.join(path['wires']), ', '.join(splice_list)))
 
         return sorted(output, key=lambda y: y[0])
 
@@ -229,7 +236,10 @@ class GraphManager:
             Prints the DFS of every PDC node in the graph
             Test helper function. remove on release
         '''
-        pdcs =  [x for x,y in self._g.nodes(data=True) if y['fuse_rating']>=0]
+        pdcs = [x for x, y in self._g.nodes(data=True) if y['fuse_rating'] >= 0]
         pdcs.sort()
-        for node in pdcs:
-            print(node, ':', nx.dfs_successors(self._g, source=node))
+        try:
+            for node in pdcs:
+                print(node, ':', dict(nx.simple_cycles(self._g)))
+        except nx.exception.NetworkXNoCycle:
+            print('no cycles')

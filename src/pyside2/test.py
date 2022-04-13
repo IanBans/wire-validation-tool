@@ -1,6 +1,8 @@
 from inputparser import *
 from graphmanager import *
 from export import *
+from datetime import datetime
+start = datetime.now()
 
 i = InputParser()
 g = GraphManager()
@@ -13,15 +15,17 @@ chass = i.readReport("C:\\Users\\Ian\\Documents\\test\\chass.xlsx", ("FROM", "F_
 t1report = i.readReport("C:\\Users\\Ian\\Documents\\test\\allInOneCsv_t1.xlsx", ("From Component: Name", "From Pin/Cavity: Name"), ("To Component: Name", "To Pin/Cavity: Name"), "Wire CSA", "Name")
 t2report = i.readReport("C:\\Users\\Ian\\Documents\\test\\allInOneCsv_T2.xlsx", ("From Component: Name", "From Pin/Cavity: Name"), ("To Component: Name", "To Pin/Cavity: Name"), "Wire CSA", "Name")
 
-g.addReport(t1report)
-#g.addReport(t2report)
+e.setFilePath("C:\\Users\\Ian\\Documents\\test\\output.xlsx")
+p = i.readPDC("C:\\Users\\Ian\\Documents\\test\\PDCfuseMapTest.csv")
+#t1pdc = i.readPDC("C:\\Users\\Ian\\Documents\\test\\pdc outs t1.csv")
+#t2pdc = i.readPDC("C:\\Users\\Ian\\Documents\\test\\pdc outs t2.csv")
+g.addPDC(p)
 #g.addReport(eng)
-e.setFilePath("C:\\Users\\Ian\\Documents\\test\\output_t1_bfs.xlsx")
-p = i.readPDC("C:\\Users\\Ian\\Documents\\test\\PDCfuseMap.csv")
-t1pdc = i.readPDC("C:\\Users\\Ian\\Documents\\test\\pdc outs t1.csv")
-t2pdc = i.readPDC("C:\\Users\\Ian\\Documents\\test\\pdc outs t2.csv")
-g.addPDC(t1pdc)
-#g.addPDC(t2pdc)
-g.analyzeCycles()
-e.exportToExcel(g.spliceTraverse('bfs'))
-g.printPdcNodes()
+g.addReport(r)
+#g.addReport(chass)
+#g.analyzeCycles()
+g.printTraverse()
+#e.exportToExcel(g.spliceTraverse('bfs'))
+#g.printPdcNodes()
+end = datetime.now()
+print("exec time = ", end-start)
