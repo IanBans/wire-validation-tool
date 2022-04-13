@@ -151,24 +151,38 @@ class GraphManager:
         min_csa = math.inf
         wires = set()
         splice_list = []
+        modified = True
         try:
             loop = dict(nx.find_cycle(self._g, source=pdc))
         except nx.exception.NetworkXNoCycle:
             return False
         else:
+            # transform values to expected list format
+            for key, value in loop.items():
+                l = []
+                if type(value) is not list:
+                    l.append(value)
+                    loop[key] = l
+
             loop_start = list(loop)[0]
-            enum = loop.items()
-            for start, end in enum:
-                # each wire, update the minimum CSA and add to
-                # the wires list
-                curr_csa = self._g[start][end]['csa']
-                wname = self._g[start][end]['wire']
-                if wname not in wires:
-                    wires.add(wname)
-                    if curr_csa < min_csa:
-                        min_csa = curr_csa
-                    if end[0] == 'S':
-                        splice_list.append(end)
+            while modified:
+                for start, ends in loop.items():
+                    modified = False
+                    # each wire, update the minimum CSA and add to
+                    # the wires list
+                    for end in ends:
+                        curr_csa = self._g[start][end]['csa']
+                        wname = self._g[start][end]['wire']
+                        if wname not in wires:
+                            wires.add(wname)
+                            if curr_csa < min_csa:
+                                min_csa = curr_csa
+                            if end[0] == 'S':
+                                splice_list.append(end)
+                                loop.update(nx.bfs_successors(self._g, end))
+                                modified = True
+
+
             return (loop_start, loop_start, min_csa, ', '.join(wires), ', '.join(splice_list))
 
 
@@ -240,6 +254,6 @@ class GraphManager:
         pdcs.sort()
         try:
             for node in pdcs:
-                print(node, ':', dict(nx.simple_cycles(self._g)))
+                print(node, ':', dict(nx.find_cycle(self._g, node)))
         except nx.exception.NetworkXNoCycle:
             print('no cycles')
