@@ -146,8 +146,8 @@ class GraphManager:
                                 loop.update(nx.bfs_successors(self._g, end))
                                 search = True
 
-            return ( (loop_head, loop_head, min_csa, ', '.join(wires), ', '.join(splice_list)),
-                     wires )
+            return ((loop_head, loop_head, min_csa, ', '.join(wires), ', '.join(splice_list)),
+                    wires)
 
     def spliceTraverse(self):
         '''
@@ -198,11 +198,11 @@ class GraphManager:
 
                                 splice_list = list(path['splice'])
 
-                                # remove the loop wires from the path wire set
+                                # remove potential loop wires from the path wire set
                                 # before adding to output
                                 wire_set = path['wires'].difference(loop_wires)
                                 output.append((path['start'], path['end'], path['min_csa'],
-                                                  ', '.join(wire_set), ', '.join(splice_list)))
+                                              ', '.join(wire_set), ', '.join(splice_list)))
 
         return sorted(output, key=lambda y: y[0])
 
