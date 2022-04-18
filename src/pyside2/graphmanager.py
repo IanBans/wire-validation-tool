@@ -18,9 +18,8 @@ class GraphManager:
                 prints all edges currently in the graph
     """
 
-    def __init__(self, gui):
+    def __init__(self):
         self._g = nx.Graph()
-        self.gui = gui
 
     def printNodes(self):
         """

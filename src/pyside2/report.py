@@ -17,7 +17,7 @@ class Report:
         read(): reads the report stored in filepath and adds it to sheet_list
     """
 
-    def __init__(self, filepath, from_labels, to_labels, csa, desc, gui):
+    def __init__(self, filepath, from_labels, to_labels, csa, desc):
         self.filepath = filepath
         self.filename = os.path.basename(filepath)
         self.to_labels = to_labels
@@ -26,7 +26,6 @@ class Report:
         self.desc = desc
         self.sheet_list = []
         self.read()
-        self.gui = gui
 
     def getContents(self):
         """
