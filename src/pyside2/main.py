@@ -198,9 +198,8 @@ class App(QMainWindow):
                 self.graph.addPDC(pdc)
             for report in self.parser.getReports():
                 self.graph.addReport(report)
-            self.graph.removeCycles()
-            self.export.setFilePath("C:\\Users\\Ian\\demo\\demo_output.xlsx")
-            self.export.exportToExcel(self.graph.spliceTraverse('bfs'))
+            self.export.exportToExcel(self.graph.traceWires())
+
         self.wire_report_list.itemClicked.connect(
             lambda: fields_selector.setCurrentIndex(self.wire_report_list.currentIndex().row()))
         page.setLayout(page_layout)

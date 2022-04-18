@@ -140,7 +140,7 @@ class GraphManager:
                                 min_csa = curr_csa
                             # if a splice is detected, there is potential for more ends
                             # a BFS is needed to record all the wires.
-                            # set 'modified' flag to update the iterator
+                            # set 'search' flag to update the iterator
                             if end[0] == 'S':
                                 splice_list.append(end)
                                 loop.update(nx.bfs_successors(self._g, end))
@@ -149,7 +149,7 @@ class GraphManager:
             return ((loop_head, loop_head, min_csa, ', '.join(wires), ', '.join(splice_list)),
                     wires)
 
-    def spliceTraverse(self):
+    def traceWires(self):
         '''
 
             Traces each wire in the pdc to it's endpoint(s).
@@ -208,11 +208,11 @@ class GraphManager:
 
     def printTraverse(self):
         '''
-            Prints the result of spliceTraverse
+            Prints the result of traceWires
             to console
             Testing helper function. remove on release
         '''
-        for item in self.spliceTraverse():
+        for item in self.traceWires():
             print(item)
 
     def printPdcNodes(self):
