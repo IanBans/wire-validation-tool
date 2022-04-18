@@ -18,9 +18,10 @@ class InputParser:
             column labels
     """
 
-    def __init__(self):
+    def __init__(self, gui):
         self._reports = []
         self._pdcs = {}
+        self.gui = gui
 
     def getReports(self):
         """
@@ -71,6 +72,6 @@ class InputParser:
             creates and reads the report, stores the report object in
             self.reports list, and returns the data
         """
-        report = Report(filename, from_labels, to_labels, csa, desc)
+        report = Report(filename, from_labels, to_labels, csa, desc, self.gui)
         self._reports.append(report)
         return report
