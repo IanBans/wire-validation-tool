@@ -37,7 +37,7 @@ class ExportManager:
         works = workb.active
 
         first_row = ["Starting Component | PIN", "Ending Component | PIN", "Minimum CSA",
-                    "Wires", "Splice(s)"]
+                     "Wires", "Splice(s)"]
         works.append(first_row)
         # write rows
         for row in rows:
