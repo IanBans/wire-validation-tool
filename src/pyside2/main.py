@@ -270,10 +270,8 @@ class App(QMainWindow):
                 self.graph.addPDC(pdc)
             for report in self.parser.getReports():
                 self.graph.addReport(report)
-            self.graph.removeCycles()
-            self.export.exportToExcel(self.graph.traverse())
-            self.graph.printNodes()
-            self.graph.printEdges()
+
+            self.export.exportToExcel(self.graph.traceWires())
 
         def checkConfigSelection(combo_box, checkbox, line):
             combo_box.update()
