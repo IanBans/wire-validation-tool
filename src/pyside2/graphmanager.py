@@ -18,8 +18,9 @@ class GraphManager:
                 prints all edges currently in the graph
     """
 
-    def __init__(self):
+    def __init__(self, gui):
         self._g = nx.Graph()
+        self.gui = gui
 
     def printNodes(self):
         """
@@ -143,22 +144,21 @@ class GraphManager:
                             # set 'search' flag to update the iterator
                             if end[0] == 'S':
                                 splice_list.append(end)
-                                loop.update(nx.bfs_successors(self._g, end))
+                                loop = loop | dict(nx.bfs_successors(self._g, end))
                                 search = True
 
             return ((loop_head, loop_head, min_csa, ', '.join(wires), ', '.join(splice_list)),
                     wires)
 
     def traceWires(self):
-        '''
-
+        """
             Traces each wire in the pdc to it's endpoint(s).
             Outputs the start and end component/pin, each wire, and the
             minimum CSA of all wires in the path
             output format:
             (startComponent|startPin, endComponent|endPin, min_csa, wire1, wire2, ..., wire_n,
             splice1, splice2, etc)
-        '''
+        """
         output = []
         # gather all the pdcs into a list
         pdcs = [x for x, y in self._g.nodes(data=True) if y['fuse_rating'] >= 0]

@@ -14,8 +14,10 @@ class ExportManager:
                 at file_path
     """
 
-    def __init__(self):
+
+    def __init__(self, gui):
         self.fpath = "output.xlsx"
+        self.gui = gui
 
     def setFilePath(self, file_path):
         """
