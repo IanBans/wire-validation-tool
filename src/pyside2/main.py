@@ -1,10 +1,8 @@
 import sys
 from pathlib import Path
-
-import PySide2.QtWidgets
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
-from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QCheckBox
+from PySide2.QtWidgets import QApplication, QCheckBox, QLineEdit, QFrame
 from PySide2.QtGui import Qt, QPalette, QColor, QBrush
 from openpyxl import load_workbook
 from inputparser import InputParser
@@ -39,8 +37,9 @@ class App(QMainWindow):
         self.pdc_paths = []
         self.wire_report_configs = CsvConfig()
         self.wire_report_list = QListWidget()
+        self.left_widget_layout = QFormLayout()
+        self.right_widget_layout = QFormLayout()
         self.setupUI()
-
 
     def setupUI(self):
         """
@@ -58,8 +57,6 @@ class App(QMainWindow):
         self.stacked_widget.show()
 
         # Qwidget that contains paths of all wire Reports
-
-
 
     def goToPage(self, target):
         """
@@ -184,8 +181,6 @@ class App(QMainWindow):
         self.stacked_widget.addWidget(file_picker_widgets)
         file_picker_widgets.setLayout(file_picker_layout)
 
-        self.left_widget_layout = QFormLayout()
-        self.right_widget_layout = QFormLayout()
         self.left_widget_layout.setFormAlignment(Qt.AlignHCenter)
         self.right_widget_layout.setFormAlignment(Qt.AlignHCenter)
         file_picker_layout.addLayout(self.left_widget_layout, 0, 0)
@@ -238,7 +233,7 @@ class App(QMainWindow):
                     config = self.wire_report_configs.search(
                         load_wire_report_dict[counter].currentText())
                     del config[0]
-                    wire_report_dict.update({key : config})
+                    wire_report_dict.update({key: config})
                     continue
 
                 # read combox_dict
@@ -331,7 +326,7 @@ class App(QMainWindow):
         checkbox_dict = {}
         load_wire_report_dict = {}
         page_layout.addWidget(wire_csv_stacked_widget, 1, 0, 1, 2, Qt.AlignHCenter)
-        #change view of page according to which wire report is selected
+        # change view of page according to which wire report is selected
         self.wire_report_list.itemClicked.connect(
             lambda: wire_csv_stacked_widget.setCurrentIndex(
                 self.wire_report_list.currentIndex().row()))
@@ -343,25 +338,27 @@ class App(QMainWindow):
             wire_csv_stacked_widget.addWidget(container)
             format_selector = QGridLayout()
             container.setLayout(format_selector)
-            format_selector.addWidget(PySide2.QtWidgets.QLabel("Or select saved wire report format")
-                                                                , 0, 2)
+            format_selector.addWidget(
+                QLabel("Or select saved wire report format"), 0, 2)
             combo_box = QComboBox()
             combo_box.addItem("Choose Option")
             for row in self.wire_report_configs.returnAllNames():
                 combo_box.addItem(row)
-            load_wire_report_dict.update({x : combo_box})
+            load_wire_report_dict.update({x: combo_box})
 
-            checkbox = PySide2.QtWidgets.QCheckBox()
+            checkbox = QCheckBox()
             checkbox.setText("click here to save the above configuration for future use")
             checkbox.adjustSize()
 
-            line = PySide2.QtWidgets.QLineEdit()
+            line = QLineEdit()
             line.setPlaceholderText("Enter the name of this configuration")
             line.setMaximumWidth(400)
             line.adjustSize()
 
-            checkbox.stateChanged.connect(lambda: checkConfigSelection(combo_box, checkbox, line))
-            combo_box.currentTextChanged.connect(lambda: checkConfigSelection(combo_box, checkbox, line))
+            checkbox.stateChanged.connect(
+                lambda: checkConfigSelection(combo_box, checkbox, line))
+            combo_box.currentTextChanged.connect(
+                lambda: checkConfigSelection(combo_box, checkbox, line))
 
             checkbox_dict.update({x: (checkbox, line)})
             format_selector.addWidget(combo_box, 1, 2)
@@ -369,9 +366,9 @@ class App(QMainWindow):
             format_selector.addWidget(line, 1, 0)
             format_selector.setSpacing(20)
             format_selector.setMargin(20)
-            draw_line = PySide2.QtWidgets.QFrame()
-            draw_line.setFrameShape(PySide2.QtWidgets.QFrame.VLine)
-            draw_line.setFrameShadow(PySide2.QtWidgets.QFrame.Raised)
+            draw_line = QFrame()
+            draw_line.setFrameShape(QFrame.VLine)
+            draw_line.setFrameShadow(QFrame.Raised)
             format_selector.addWidget(draw_line, 0, 1, 3, 1)
             container.adjustSize()
 
@@ -416,12 +413,13 @@ class App(QMainWindow):
         submit.clicked.connect(makeDict)
         submit.clicked.connect(sendReports)
 
-    def reportError(self, error_code):
-        """
-        error_code: specifies what type of error recieved
-        used by other modules to report errors encountered
-        """
-        print(error_code)
+def reportError(error_code):
+    """
+    error_code: specifies what type of error recieved
+    used by other modules to report errors encountered
+    """
+    print(error_code)
+
 
 def readColumnNames(filename):
     """
@@ -434,7 +432,6 @@ def readColumnNames(filename):
     if filename:
         workb = load_workbook(filename, read_only=True)
         sheet = workb.active
-
         for first_row in sheet.iter_rows(1, 1, 1, sheet.max_column, True):
             names = list(first_row)
     return names
@@ -449,6 +446,7 @@ def cleanPathName(path):
     while path[i] != '/' and path[i] != '\\':
         i = i - 1
     return path[i + 1:]
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

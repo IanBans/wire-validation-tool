@@ -12,7 +12,7 @@ class CsvConfig:
         """
 
     def __init__(self):
-        #tests if the csv file can be opened
+        # tests if the csv file can be opened
         try:
             file = open("test.txt", "r+")
         except:
@@ -27,7 +27,6 @@ class CsvConfig:
                     wire_csa,description\n":
                         break
             file.close()
-        print(self.returnAllNames())
 
     def search(self, name):
         """
