@@ -35,7 +35,7 @@ class App(QMainWindow):
         self.stacked_widget = QStackedWidget()
         self.wire_report_paths = []
         self.pdc_paths = []
-        self.wire_report_configs = CsvConfig()
+        self.wire_report_configs = CsvConfig("configs.csv")
         self.wire_report_list = QListWidget()
         self.left_widget_layout = QFormLayout()
         self.right_widget_layout = QFormLayout()
