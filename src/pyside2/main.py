@@ -45,7 +45,7 @@ class App(QMainWindow):
         """
             sets up UI elements and ties them together
         """
-        # the staacked widget is the app container that swaps which widget is shown
+        # the stacked widget is the app container that swaps which widget is shown
         # Each widget is a page
         self.stacked_widget.setMinimumSize(500, 300)
         self.stacked_widget.resize(700, 400)
@@ -156,16 +156,17 @@ class App(QMainWindow):
 
         def openSaveFileDialog():
             """
-                opens the file picker sorted to .csv files
-                sets the button to the file name picked
+                opens file picker for saving files
             """
             options = QFileDialog.Options()
             options |= QFileDialog.DontUseNativeDialog
-            filename = QFileDialog.getExistingDirectory(self,
+            directory = QFileDialog.getExistingDirectory(self,
                                                         "choose file to save",
                                                         Path.home().as_posix())
-            # placeholder to not set off pylint
-            filename = filename[0]
+            if directory:
+                self.export.setDirectory(directory)
+                save.setText(self.export.getSavePath())
+
 
         file_picker_widgets = QWidget()
         file_picker_layout = QGridLayout()
@@ -177,7 +178,6 @@ class App(QMainWindow):
         wire_button = QPushButton('Add Wire Reports')
         save = QPushButton("Choose Where to Save ...")
         save.clicked.connect(openSaveFileDialog)
-
         self.stacked_widget.addWidget(file_picker_widgets)
         file_picker_widgets.setLayout(file_picker_layout)
 
@@ -234,6 +234,7 @@ class App(QMainWindow):
                         load_wire_report_dict[counter].currentText())
                     del config[0]
                     wire_report_dict.update({key: config})
+                    print("printing config: ", config)
                     continue
 
                 # read combox_dict
@@ -275,6 +276,7 @@ class App(QMainWindow):
 
         def checkConfigSelection(combo_box, checkbox, line):
             combo_box.update()
+            makeDict()
             print(combo_box.currentText())
             print(checkbox.checkState())
             if combo_box.currentIndex() != 0:
