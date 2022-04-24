@@ -1,7 +1,7 @@
 from openpyxl import Workbook
 from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
 from openpyxl.utils import get_column_letter
-import os
+from os import path
 from pathlib import Path
 
 class ExportManager:
@@ -19,19 +19,22 @@ class ExportManager:
     def __init__(self, gui):
         self.dir = Path.home().as_posix()
         self.fpath = "output.xlsx"
+        self.save_path = path.normpath(path.join(self.dir, self.fpath))
         self.gui = gui
 
     def setFilePath(self, file_path):
         """
             setter for file path attributes
         """
-        self.fpath = file_path
+        self.fpath = str(file_path)
+        self.save_path = path.normpath(path.join(self.dir, self.fpath))
 
     def getSavePath(self):
-        return (os.path.join(self.dir, self.fpath))
+        return self.save_path
 
     def setDirectory(self, directory):
         self.dir = str(directory)
+        self.save_path = path.normpath(path.join(self.dir, self.fpath))
 
 
     def exportToExcel(self, rows):
@@ -41,7 +44,7 @@ class ExportManager:
                 or tuple of tuples). Each element in the outer collection will
                 be read as a row to be written to the worksheet.
         """
-        file_path = os.path.join(self.dir, self.fpath)
+
 
         # create workbook
         workb = Workbook()
@@ -60,5 +63,5 @@ class ExportManager:
             dim_holder[get_column_letter(col)] = ColumnDimension(works, min=col, max=col, width=25)
 
         works.column_dimensions = dim_holder
-        print("saving trace to: ", file_path)
-        workb.save(file_path)
+        print("saving trace to: ", self.save_path)
+        workb.save(self.save_path)
