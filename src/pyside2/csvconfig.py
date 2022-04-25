@@ -27,7 +27,6 @@ class CsvConfig:
                     wire_csa,description\n":
                         break
             file.close()
-        print(self.returnAllNames())
 
     def search(self, name):
         """
