@@ -4,7 +4,7 @@ from pathlib import Path
 import PySide2.QtWidgets
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
-from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QCheckBox
+from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QCheckBox, QHBoxLayout
 from PySide2.QtGui import Qt, QPalette, QColor, QBrush
 from openpyxl import load_workbook
 from inputparser import InputParser
@@ -37,7 +37,7 @@ class App(QMainWindow):
         self.stacked_widget = QStackedWidget()
         self.wire_report_paths = []
         self.pdc_paths = []
-        self.wire_report_configs = CsvConfig()
+        self.wire_report_configs = CsvConfig(self)
         self.wire_report_list = QListWidget()
         self.setupUI()
 
@@ -106,13 +106,17 @@ class App(QMainWindow):
 
             remove_button = QPushButton("Remove")
             remove_button.setMaximumWidth(100)
+
             label = QLabel(path)
+            label.setMinimumWidth(1)
+            label.adjustSize()
             remove_button.clicked.connect(lambda: removeReport(label))
 
             if side == "wire":
                 self.left_widget_layout.addRow(label, remove_button)
             else:
                 self.right_widget_layout.addRow(label, remove_button)
+
 
         def openCSVFileDialog():
             """
@@ -203,6 +207,7 @@ class App(QMainWindow):
         self.stacked_widget.addWidget(file_picker_widgets)
         self.pages.update({'file_picker': file_picker_widgets})
 
+        # add naviagtion buttons
         next_button.clicked.connect(self.setupWireReports)
         next_button.clicked.connect(lambda: self.goToPage('wire_reports'))
         next_button.setEnabled(False)
@@ -210,13 +215,6 @@ class App(QMainWindow):
         file_picker_layout.addWidget(save, 1, 0, 1, 2)
         save.setMaximumWidth(200)
         next_button.setMaximumWidth(200)
-        home = QPushButton("Home")
-        home.clicked.connect(lambda: self.goToPage("file_picker"))
-        home.setMinimumWidth(150)
-        home_color = QPalette(QApplication.palette())
-        home_color.setBrush(QPalette.Button, QBrush(QColor(165, 214, 255)))
-        home.setPalette(home_color)
-        file_picker_layout.addWidget(home, 2, 1, Qt.AlignRight)
 
     def setupWireReports(self):
         """
@@ -229,32 +227,106 @@ class App(QMainWindow):
                 combobox objects
                 Also checks if data needs to be written to or from csvConfig
             """
-            counter = -1
+
             for key, value in combo_box_dict.items():
-                counter += 1
-
-                # check user wants to load wire_report_configuration
-                if load_wire_report_dict[counter].currentIndex() != 0:
-                    config = self.wire_report_configs.search(
-                        load_wire_report_dict[counter].currentText())
-                    del config[0]
-                    wire_report_dict.update({key : config})
-                    continue
-
                 # read combox_dict
                 report_list = []
                 for box in value:
                     report_list.append(box.currentText())
 
-                # check if user wants to save a new wire report config
-                if checkbox_dict[counter][0].isChecked():
-                    new_config = []
-                    new_config.append(checkbox_dict[counter][1].text())
-                    for item in report_list:
-                        new_config.append(item)
-                    print(new_config)
-                    self.wire_report_configs.add(new_config)
                 wire_report_dict.update({key: report_list})
+            print(wire_report_dict)
+
+        def saveNewConfig(button_dict, combo_box_dict):
+            """
+                button_dict key is the index and the value is a list with these values:
+                    line: QlineEdit contains the name of the config to be deleted
+                    save: save button that is enabled by this method
+                    delete: button that deletes config
+                    combo_box: conatins all saved csv configs. contents get updated in this method
+                combo_boxe_dict: dictionary of wire report names paired with a list of combo boxes
+                    that describe what each column is named
+                Update the csv file to include another wire report config
+                    enables the delete button,and disables the save button and line edit
+            """
+            index = self.wire_report_list.currentRow()
+            new_config = []
+            new_config.append(button_dict[index][0].text())
+            for key in combo_box_dict.keys():
+                if self.wire_report_list.currentItem().text() in key:
+                    for value in combo_box_dict[key]:
+                        new_config.append(value.currentText())
+                    break
+            self.wire_report_configs.add(new_config)
+            # deactivate buttons to edit and activate button that deletes
+            button_dict[index][0].setEnabled(False)
+            button_dict[index][1].setEnabled(False)
+            button_dict[index][2].setEnabled(True)
+            # check if user is overwriting exisiting config
+            if button_dict[index][3].findText(button_dict[index][0].text()) != -1:
+                return
+            # update each combobox holding configs
+            for x in button_dict.keys():
+                button_dict[x][3].addItem(button_dict[index][0].text())
+                button_dict[x][3].update()
+
+
+        def deleteNewConfig(button_dict):
+            """
+                index: which wire report is being edited
+                button_dict key is the index and the value is a list with these values:
+                    line: QlineEdit contains the name of the config to be deleted
+                    save: save button that is enabled by this method
+                    delete: button that deletes config
+                    combo_box: conatins all saved csv configs. contents get updated in this method
+                Deletes the user specified saved config from the csv file, disables the delete button,
+                and renables the save button and line edit
+            """
+            index = self.wire_report_list.currentRow()
+            self.wire_report_configs.delete(button_dict[index][0].text())
+
+            # deactivate buttons to edit and activate button that deletes
+            button_dict[index][0].setEnabled(True)
+            button_dict[index][1].setEnabled(True)
+            button_dict[index][2].setEnabled(False)
+
+            # update each combobox holding configs
+            for x in button_dict.keys():
+                box_to_remove = button_dict[x][3].findText(button_dict[index][0].text())
+                # if the item is not in the combobox skip
+                if box_to_remove == -1:
+                    continue
+                button_dict[x][3].removeItem(box_to_remove)
+                button_dict[x][3].update()
+
+        def loadCsvConfig():
+            """
+                When the user wants to load a wire report config,
+                this method will update all the combo boxes that
+                the user would normally fill in themselves
+            """
+            layer = self.wire_report_list.currentItem().text()
+            index = self.wire_report_list.currentRow()
+            # ignore if the user selects "choose option"
+            if csv_config_buttons[index][3].currentIndex() == 0:
+                return
+            # look for the correct wire report
+            for report in combo_box_dict.keys():
+                if layer in report:
+                    # load data from csv
+                    fields = self.wire_report_configs.search(
+                        csv_config_buttons[index][3].currentText())
+                    # for each box, change index to new_index
+                    counter = 0
+                    for box in combo_box_dict[report]:
+                        counter += 1
+                        new_index = box.findText(fields[counter])
+                        if new_index == - 1:
+                            print("Error. Attempting to load csv config that is not compatible"
+                                   " with current wire report excel sheet")
+                            return
+                        box.setCurrentIndex(new_index)
+                    return
 
         def sendReports():
             """
@@ -277,25 +349,10 @@ class App(QMainWindow):
                 self.graph.addReport(report)
             self.graph.removeCycles()
             self.export.exportToExcel(self.graph.traverse())
-            self.graph.printNodes()
-            self.graph.printEdges()
+            #self.graph.printNodes()
+            #self.graph.printEdges()
 
-        def checkConfigSelection(combo_box, checkbox, line):
-            combo_box.update()
-            print(combo_box.currentText())
-            print(checkbox.checkState())
-            if combo_box.currentIndex() != 0:
-                checkbox.setEnabled(False)
-                line.setEnabled(False)
-            elif checkbox.isChecked():
-                combo_box.setEnabled(False)
-                line.setEnabled(True)
-            elif combo_box.currentIndex == 0 and not checkbox.isChecked():
-                combo_box.setEnabled(True)
-                checkbox.setEnabled(True)
-                line.setEnabled(True)
 
-        wire_report_dict = {}
         # this list contains all the column fields names
         # necessary for reading the input
         fields_list = ['From Component',
@@ -312,8 +369,10 @@ class App(QMainWindow):
 
         # the Dictionary that contains all the wire column fields.
         # The key is the wire path and the value is a list of QComboBoxes
-        # that contain wire fields
+        # that contain the wire report fields
         combo_box_dict = {}
+        # same as the above dict but contains strings instead of QCombobox objects
+        wire_report_dict = {}
 
         self.wire_report_list.itemClicked.connect(
             lambda: fields_selector.setCurrentIndex(self.wire_report_list.currentIndex().row()))
@@ -327,9 +386,10 @@ class App(QMainWindow):
         # save and load wire harness configurations
 
         wire_csv_stacked_widget = QStackedWidget()
-        # the following two vars are used to keep track of the state of above stacked widget
-        checkbox_dict = {}
-        load_wire_report_dict = {}
+        # keeps track of the multiple instances of widgets that save and load csv configs
+        # {index: [line edit, save buttom, delete button, combo box] }
+        csv_config_buttons = {}
+
         page_layout.addWidget(wire_csv_stacked_widget, 1, 0, 1, 2, Qt.AlignHCenter)
         #change view of page according to which wire report is selected
         self.wire_report_list.itemClicked.connect(
@@ -343,41 +403,51 @@ class App(QMainWindow):
             wire_csv_stacked_widget.addWidget(container)
             format_selector = QGridLayout()
             container.setLayout(format_selector)
-            format_selector.addWidget(PySide2.QtWidgets.QLabel("Or select saved wire report format")
-                                                                , 0, 2)
+
+            # create widgets and edit settings
+            format_selector.addWidget(PySide2.QtWidgets.QLabel(
+                                                    "Or select saved wire report format"), 0, 2)
             combo_box = QComboBox()
             combo_box.addItem("Choose Option")
             for row in self.wire_report_configs.returnAllNames():
                 combo_box.addItem(row)
-            load_wire_report_dict.update({x : combo_box})
-
-            checkbox = PySide2.QtWidgets.QCheckBox()
-            checkbox.setText("click here to save the above configuration for future use")
-            checkbox.adjustSize()
-
+            combo_box.currentIndexChanged.connect(loadCsvConfig)
+            instructions = PySide2.QtWidgets.QLabel("To save the above column labels for later "
+                "use, please name this configution and press save")
+            instructions.adjustSize()
             line = PySide2.QtWidgets.QLineEdit()
             line.setPlaceholderText("Enter the name of this configuration")
             line.setMaximumWidth(400)
             line.adjustSize()
+            save_button = QPushButton("Save")
+            delete_button = QPushButton("Delete")
+            delete_button.setEnabled(False)
+            csv_config_buttons.update({x : [line, save_button, delete_button, combo_box]})
 
-            checkbox.stateChanged.connect(lambda: checkConfigSelection(combo_box, checkbox, line))
-            combo_box.currentTextChanged.connect(lambda: checkConfigSelection(combo_box, checkbox, line))
-
-            checkbox_dict.update({x: (checkbox, line)})
+            # add widgets to container and fix formatting
             format_selector.addWidget(combo_box, 1, 2)
-            format_selector.addWidget(checkbox, 0, 0)
+            format_selector.addWidget(instructions, 0, 0)
             format_selector.addWidget(line, 1, 0)
+            button_layout = QHBoxLayout()
+            button_layout.addWidget(save_button)
+            button_layout.addWidget(delete_button)
+            format_selector.addLayout(button_layout, 2, 0)
             format_selector.setSpacing(20)
-            format_selector.setMargin(20)
+            format_selector.setMargin(5)
             draw_line = PySide2.QtWidgets.QFrame()
             draw_line.setFrameShape(PySide2.QtWidgets.QFrame.VLine)
             draw_line.setFrameShadow(PySide2.QtWidgets.QFrame.Raised)
             format_selector.addWidget(draw_line, 0, 1, 3, 1)
             container.adjustSize()
+            container.setMaximumHeight(container.height())
 
-        # create combo boxes and add them to page
+        # create event listeners for each save and delete button
+        for key in csv_config_buttons.keys():
+            csv_config_buttons[key][1].clicked.connect(lambda: saveNewConfig(csv_config_buttons, combo_box_dict))
+            csv_config_buttons[key][2].clicked.connect(lambda: deleteNewConfig(csv_config_buttons))
+
+        # create the comboboxes that user uses to specify column names
         for wire_report in self.wire_report_paths:
-
             fields_layout = QFormLayout()
             fields_container = QWidget()
             combo_box_list = []
@@ -398,9 +468,9 @@ class App(QMainWindow):
                 fields_layout.addRow(combo_box, label)
 
             fields_selector.addWidget(fields_container)
-
         fields_selector.setCurrentIndex(0)
 
+        # add navigation buttons to the container
         back = QPushButton("Back")
         back.clicked.connect(lambda: self.goToPage("file_picker"))
         home = QPushButton("Home")
