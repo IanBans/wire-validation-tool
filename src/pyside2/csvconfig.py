@@ -11,25 +11,12 @@ class CsvConfig:
                     returns 0 on failure and 1 on success
         """
 
-    def __init__(self, filename):
+
+    def __init__(self, filename, gui):
+        #tests if the csv file can be opened
         self.filename = filename
-        # tests if the csv file can be opened
-        try:
-            file = open(self.filename, "r+")
-        except:
-            print("Cannot find csv wire configuration file, creating new")
-            file = open(self.filename, "w")
-            file.close()
-        else:
-            while True:
-                line = file.readline()
-                if not line:
-                    break
-                if line[0] != '#':
-                    if line == "name,from_component,from_pin,to_component,to_pin,\
-                    wire_csa,description\n":
-                        break
-            file.close()
+        self.clean()
+        self.gui = gui
 
     def search(self, name):
         """
@@ -37,6 +24,7 @@ class CsvConfig:
             This method searches the csv file for the row that begins with the given name
             returns a list representing the csv row where each entry is a string object
         """
+
         with open(self.filename, "r") as file:
             reader = csv.reader(file)
             target_row = []
@@ -118,14 +106,34 @@ class CsvConfig:
         """
             creates a list "names" of all the name fields for each row in the CSV and returns
         """
-        names = []
-        with open(self.filename, "r") as file:
+        try:
+            names = []
+            with open(self.filename, "r", newline="") as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    if not row:
+                        continue
+                    # ignore lines starting with '#' and the row depicting the csv row format
+                    if row[0][0] == '#' or row[0] == "name":
+                        continue
+                    names.append(row[0])
+            return names
+        except:
+            print("error reading csv file")
+        return
+
+    def clean(self):
+        """
+            removes empty lines and ensures there is exactly one new line at EOF
+        """
+        # Record contents of file except the row to be overwritten
+        new_csv = []
+        with open(self.csv_filename, "r", newline="") as file:
             reader = csv.reader(file)
             for row in reader:
                 if not row:
                     continue
-                # ignore lines starting with '#' and the row depicting the csv row format
-                if row[0][0] == '#' or row[0] == "name":
-                    continue
-                names.append(row[0])
-        return names
+                new_csv.append(row)
+        with open(self.filename, "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerows(new_csv)
