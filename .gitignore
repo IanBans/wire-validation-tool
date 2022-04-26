@@ -1,7 +1,6 @@
 #ignore __pycache__
 **/__pycache__
 #ignore pyinstaller files
-**.spec
 **.pyc
 **/build
 **/dist

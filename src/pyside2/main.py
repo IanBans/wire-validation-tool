@@ -1,7 +1,6 @@
 import sys
 from pathlib import Path
-
-import PySide2.QtWidgets
+from os.path import dirname, basename
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
 from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QCheckBox, QHBoxLayout
@@ -37,16 +36,18 @@ class App(QMainWindow):
         self.stacked_widget = QStackedWidget()
         self.wire_report_paths = []
         self.pdc_paths = []
-        self.wire_report_configs = CsvConfig(self)
+        self.wire_report_configs = CsvConfig("configs.csv", self)
         self.wire_report_list = QListWidget()
+        self.left_widget_layout = QFormLayout()
+        self.right_widget_layout = QFormLayout()
+        self.working_directory = Path.home().as_posix()
         self.setupUI()
-
 
     def setupUI(self):
         """
             sets up UI elements and ties them together
         """
-        # the staacked widget is the app container that swaps which widget is shown
+        # the stacked widget is the app container that swaps which widget is shown
         # Each widget is a page
         self.stacked_widget.setMinimumSize(500, 300)
         self.stacked_widget.resize(700, 400)
@@ -58,8 +59,6 @@ class App(QMainWindow):
         self.stacked_widget.show()
 
         # Qwidget that contains paths of all wire Reports
-
-
 
     def goToPage(self, target):
         """
@@ -92,7 +91,7 @@ class App(QMainWindow):
                     for item in range(self.wire_report_list.count()):
                         if not self.wire_report_list.item(item):
                             continue
-                        if self.wire_report_list.item(item).text() == cleanPathName(label.text()):
+                        if self.wire_report_list.item(item).text() == basename(label.text()):
                             self.wire_report_list.takeItem(item)
                     self.wire_report_paths.remove(label.text())
                     self.left_widget_layout.removeRow(label)
@@ -120,17 +119,16 @@ class App(QMainWindow):
 
         def openCSVFileDialog():
             """
-                opens the file picker to select a dirctory to save the output to
+                opens the file picker to select .csv files
+                to pick fuse maps. Adds fuse maps to path object
+                and GUI
             """
-            options = QFileDialog.Options()
-            options |= QFileDialog.DontUseNativeDialog
 
-            filename, _ = QFileDialog.getOpenFileNames(self,
+            filenames, _ = QFileDialog.getOpenFileNames(self,
                                                        'Choose file',
-                                                       Path.home().as_posix(),
-                                                       'CSV Files (*.csv)',
-                                                       options=options)
-            for file in filename:
+                                                       self.working_directory,
+                                                       'CSV Files (*.csv)')
+            for file in filenames:
                 if file not in self.pdc_paths:
                     self.pdc_paths.append(file)
                     createReportLabel(file, "pdc")
@@ -138,41 +136,47 @@ class App(QMainWindow):
                 next_button.setEnabled(True)
             else:
                 next_button.setEnabled(False)
+            if filenames:
+                self.working_directory = dirname(filenames[0])
+
 
         def openExcelFileDialog():
             """
-                opens the file picker sorted to .excel files
+                opens the file picker sorted to .xlsx files
+                to pick wire reports, adds picked files to
+                the wire report lists and GUI
             """
-            options = QFileDialog.Options()
-            options |= QFileDialog.DontUseNativeDialog
-            filename, _ = QFileDialog.getOpenFileNames(self,
+            filenames, _ = QFileDialog.getOpenFileNames(self,
                                                        'Choose file',
-                                                       Path.home().as_posix(),
-                                                       'Excel Files (*.xlsx)',
-                                                       options=options)
+                                                       self.working_directory,
+                                                       'Excel Files (*.xlsx)')
 
-            for file in filename:
+            for file in filenames:
                 if file not in self.wire_report_paths:
                     createReportLabel(file, "wire")
                     self.wire_report_paths.append(file)
-                    self.wire_report_list.addItem(cleanPathName(file))
+                    self.wire_report_list.addItem(basename(file))
+                self.working_directory = dirname(file)
             if self.wire_report_paths and self.pdc_paths:
                 next_button.setEnabled(True)
             else:
                 next_button.setEnabled(False)
+            if filenames:
+                self.working_directory = dirname(filenames[0])
 
         def openSaveFileDialog():
             """
-                opens the file picker sorted to .csv files
-                sets the button to the file name picked
+                opens file picker to choose save location
+                adds save path to GUI
             """
-            options = QFileDialog.Options()
-            options |= QFileDialog.DontUseNativeDialog
-            filename = QFileDialog.getExistingDirectory(self,
-                                                        "choose file to save",
-                                                        Path.home().as_posix())
-            # placeholder to not set off pylint
-            filename = filename[0]
+            save_file, _ = QFileDialog.getSaveFileName(self,
+                                                        "choose save location",
+                                                        Path.home().as_posix(),
+                                                        'Excel Files (*.xlsx)')
+            if save_file:
+                self.export.setSavePath(save_file)
+                save.setText(self.export.getSavePath())
+
 
         file_picker_widgets = QWidget()
         file_picker_layout = QGridLayout()
@@ -184,12 +188,9 @@ class App(QMainWindow):
         wire_button = QPushButton('Add Wire Reports')
         save = QPushButton("Choose Where to Save ...")
         save.clicked.connect(openSaveFileDialog)
-
         self.stacked_widget.addWidget(file_picker_widgets)
         file_picker_widgets.setLayout(file_picker_layout)
 
-        self.left_widget_layout = QFormLayout()
-        self.right_widget_layout = QFormLayout()
         self.left_widget_layout.setFormAlignment(Qt.AlignHCenter)
         self.right_widget_layout.setFormAlignment(Qt.AlignHCenter)
         file_picker_layout.addLayout(self.left_widget_layout, 0, 0)
@@ -347,11 +348,7 @@ class App(QMainWindow):
                 self.graph.addPDC(pdc)
             for report in self.parser.getReports():
                 self.graph.addReport(report)
-            self.graph.removeCycles()
-            self.export.exportToExcel(self.graph.traverse())
-            #self.graph.printNodes()
-            #self.graph.printEdges()
-
+            self.export.exportToExcel(self.graph.traceWires())
 
         # this list contains all the column fields names
         # necessary for reading the input
@@ -391,7 +388,7 @@ class App(QMainWindow):
         csv_config_buttons = {}
 
         page_layout.addWidget(wire_csv_stacked_widget, 1, 0, 1, 2, Qt.AlignHCenter)
-        #change view of page according to which wire report is selected
+        # change view of page according to which wire report is selected
         self.wire_report_list.itemClicked.connect(
             lambda: wire_csv_stacked_widget.setCurrentIndex(
                 self.wire_report_list.currentIndex().row()))
@@ -486,12 +483,13 @@ class App(QMainWindow):
         submit.clicked.connect(makeDict)
         submit.clicked.connect(sendReports)
 
-    def reportError(self, error_code):
-        """
-        error_code: specifies what type of error recieved
-        used by other modules to report errors encountered
-        """
-        print(error_code)
+def reportError(error_code):
+    """
+    error_code: specifies what type of error recieved
+    used by other modules to report errors encountered
+    """
+    print(error_code)
+
 
 def readColumnNames(filename):
     """
@@ -504,7 +502,6 @@ def readColumnNames(filename):
     if filename:
         workb = load_workbook(filename, read_only=True)
         sheet = workb.active
-
         for first_row in sheet.iter_rows(1, 1, 1, sheet.max_column, True):
             names = list(first_row)
     return names
@@ -514,11 +511,13 @@ def cleanPathName(path):
     """
         path: a string conatining the full path to a file
         Returns a new string by striping a path name so that only the file name remains
+
     """
     i = -1
     while path[i] != '/' and path[i] != '\\':
         i = i - 1
     return path[i + 1:]
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

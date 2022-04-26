@@ -11,9 +11,10 @@ class CsvConfig:
                     returns 0 on failure and 1 on success
         """
 
-    def __init__(self, gui):
+
+    def __init__(self, filename, gui):
         #tests if the csv file can be opened
-        self.csv_filename = "test.txt"
+        self.filename = filename
         self.clean()
         self.gui = gui
 
@@ -23,7 +24,8 @@ class CsvConfig:
             This method searches the csv file for the row that begins with the given name
             returns a list representing the csv row where each entry is a string object
         """
-        with open(self.csv_filename, "r") as file:
+
+        with open(self.filename, "r") as file:
             reader = csv.reader(file)
             target_row = []
             for row in reader:
@@ -45,7 +47,7 @@ class CsvConfig:
         """
         try:
             # first record orginal contents of text file but exclude the target row
-            with open(self.csv_filename, "r+") as file:
+            with open(self.filename, "r+") as file:
                 reader = csv.reader(file)
                 new_csv = []
                 for row in reader:
@@ -54,7 +56,7 @@ class CsvConfig:
                     if row[0] != name:
                         new_csv.append(row)
             # write new contents to the same file
-            with open(self.csv_filename, "w+", newline='') as file:
+            with open(self.filename, "w+", newline='') as file:
                 writer = csv.writer(file)
                 writer.writerows(new_csv)
         except:
@@ -75,7 +77,7 @@ class CsvConfig:
             if self.search(new_row[0]):
                 # Record contents of file except the row to be overwritten
                 new_csv = []
-                with open(self.csv_filename, "r+") as file:
+                with open(self.filename, "r+") as file:
                     reader = csv.reader(file)
                     for row in reader:
                         if not row:
@@ -83,15 +85,15 @@ class CsvConfig:
                         if row[0] != new_row[0]:
                             new_csv.append(row)
 
-                # write new contents to the same row
-                with open(self.csv_filename, "w+", newline='') as file:
+                # write new contents to the same file
+                with open(self.filename, "w+", newline='') as file:
                     writer = csv.writer(file)
                     writer.writerows(new_csv)
                     writer.writerow(new_row)
 
             # Appending new row
             else:
-                with open(self.csv_filename, "a", newline="") as file:
+                with open(self.filename, "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(new_row)
 
@@ -106,7 +108,7 @@ class CsvConfig:
         """
         try:
             names = []
-            with open(self.csv_filename, "r", newline="") as file:
+            with open(self.filename, "r", newline="") as file:
                 reader = csv.reader(file)
                 for row in reader:
                     if not row:
@@ -132,6 +134,6 @@ class CsvConfig:
                 if not row:
                     continue
                 new_csv.append(row)
-        with open(self.csv_filename, "w", newline="") as file:
+        with open(self.filename, "w", newline="") as file:
             writer = csv.writer(file)
             writer.writerows(new_csv)

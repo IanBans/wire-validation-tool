@@ -1,5 +1,8 @@
 from openpyxl import Workbook
-
+from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
+from openpyxl.utils import get_column_letter
+from os import path
+from pathlib import Path
 
 class ExportManager:
     """
@@ -12,15 +15,21 @@ class ExportManager:
                 at file_path
     """
 
-    def __init__(self, gui):
-        self.fpath = "test.xlsx"
-        self.gui = gui
 
-    def setFilePath(self, file_path):
+    def __init__(self, gui):
+        self.save_path = path.normpath(path.join(Path.home().as_posix(), "output.xlsx"))
+
+    def setSavePath(self, file_path):
         """
-            getter for file path attributes
+            setter for file path attributes
         """
-        self.fpath = file_path
+        if '.xlsx' in file_path:
+            self.save_path = str(file_path)
+        else:
+            self.save_path = str(file_path) + ".xlsx"
+
+    def getSavePath(self):
+        return self.save_path
 
     def exportToExcel(self, rows):
         """
@@ -29,15 +38,24 @@ class ExportManager:
                 or tuple of tuples). Each element in the outer collection will
                 be read as a row to be written to the worksheet.
         """
-        file_path = str(self.fpath)
+
 
         # create workbook
         workb = Workbook()
         works = workb.active
-        first_row = ["From Component | PIN", "To Component | PIN", "Min CSA"]
+
+        first_row = ["Starting Component | PIN", "Ending Component | PIN", "Minimum CSA",
+                     "Wires", "Splice(s)"]
         works.append(first_row)
         # write rows
         for row in rows:
             works.append(row)
         # save workbook
-        workb.save(file_path)
+        dim_holder = DimensionHolder(worksheet=works)
+
+        for col in range(works.min_column, works.max_column + 1):
+            dim_holder[get_column_letter(col)] = ColumnDimension(works, min=col, max=col, width=25)
+
+        works.column_dimensions = dim_holder
+        print("saving trace to: ", self.save_path)
+        workb.save(self.save_path)
