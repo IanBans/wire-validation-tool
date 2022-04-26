@@ -17,25 +17,19 @@ class ExportManager:
 
 
     def __init__(self, gui):
-        self.dir = Path.home().as_posix()
-        self.fpath = "output.xlsx"
-        self.save_path = path.normpath(path.join(self.dir, self.fpath))
-        self.gui = gui
+        self.save_path = path.normpath(path.join(Path.home().as_posix(), "output.xlsx"))
 
-    def setFilePath(self, file_path):
+    def setSavePath(self, file_path):
         """
             setter for file path attributes
         """
-        self.fpath = str(file_path)
-        self.save_path = path.normpath(path.join(self.dir, self.fpath))
+        if '.xlsx' in file_path:
+            self.save_path = str(file_path)
+        else:
+            self.save_path = str(file_path) + ".xlsx"
 
     def getSavePath(self):
         return self.save_path
-
-    def setDirectory(self, directory):
-        self.dir = str(directory)
-        self.save_path = path.normpath(path.join(self.dir, self.fpath))
-
 
     def exportToExcel(self, rows):
         """

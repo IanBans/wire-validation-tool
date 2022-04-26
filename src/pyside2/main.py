@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from os.path import dirname, basename
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
 from PySide2.QtWidgets import QApplication, QCheckBox, QLineEdit, QFrame
@@ -39,6 +40,7 @@ class App(QMainWindow):
         self.wire_report_list = QListWidget()
         self.left_widget_layout = QFormLayout()
         self.right_widget_layout = QFormLayout()
+        self.working_directory = Path.home().as_posix()
         self.setupUI()
 
     def setupUI(self):
@@ -89,7 +91,7 @@ class App(QMainWindow):
                     for item in range(self.wire_report_list.count()):
                         if not self.wire_report_list.item(item):
                             continue
-                        if self.wire_report_list.item(item).text() == cleanPathName(label.text()):
+                        if self.wire_report_list.item(item).text() == basename(label.text()):
                             self.wire_report_list.takeItem(item)
                     self.wire_report_paths.remove(label.text())
                     self.left_widget_layout.removeRow(label)
@@ -113,17 +115,16 @@ class App(QMainWindow):
 
         def openCSVFileDialog():
             """
-                opens the file picker to select a dirctory to save the output to
+                opens the file picker to select .csv files
+                to pick fuse maps. Adds fuse maps to path object
+                and GUI
             """
-            options = QFileDialog.Options()
-            options |= QFileDialog.DontUseNativeDialog
 
-            filename, _ = QFileDialog.getOpenFileNames(self,
+            filenames, _ = QFileDialog.getOpenFileNames(self,
                                                        'Choose file',
-                                                       Path.home().as_posix(),
-                                                       'CSV Files (*.csv)',
-                                                       options=options)
-            for file in filename:
+                                                       self.working_directory,
+                                                       'CSV Files (*.csv)')
+            for file in filenames:
                 if file not in self.pdc_paths:
                     self.pdc_paths.append(file)
                     createReportLabel(file, "pdc")
@@ -131,40 +132,45 @@ class App(QMainWindow):
                 next_button.setEnabled(True)
             else:
                 next_button.setEnabled(False)
+            if filenames:
+                self.working_directory = dirname(filenames[0])
+
 
         def openExcelFileDialog():
             """
-                opens the file picker sorted to .excel files
+                opens the file picker sorted to .xlsx files
+                to pick wire reports, adds picked files to
+                the wire report lists and GUI
             """
-            options = QFileDialog.Options()
-            options |= QFileDialog.DontUseNativeDialog
-            filename, _ = QFileDialog.getOpenFileNames(self,
+            filenames, _ = QFileDialog.getOpenFileNames(self,
                                                        'Choose file',
-                                                       Path.home().as_posix(),
-                                                       'Excel Files (*.xlsx)',
-                                                       options=options)
+                                                       self.working_directory,
+                                                       'Excel Files (*.xlsx)')
 
-            for file in filename:
+            for file in filenames:
                 if file not in self.wire_report_paths:
                     createReportLabel(file, "wire")
                     self.wire_report_paths.append(file)
-                    self.wire_report_list.addItem(cleanPathName(file))
+                    self.wire_report_list.addItem(basename(file))
+                self.working_directory = dirname(file)
             if self.wire_report_paths and self.pdc_paths:
                 next_button.setEnabled(True)
             else:
                 next_button.setEnabled(False)
+            if filenames:
+                self.working_directory = dirname(filenames[0])
 
         def openSaveFileDialog():
             """
-                opens file picker for saving files
+                opens file picker to choose save location
+                adds save path to GUI
             """
-            options = QFileDialog.Options()
-            options |= QFileDialog.DontUseNativeDialog
-            directory = QFileDialog.getExistingDirectory(self,
-                                                        "choose file to save",
-                                                        Path.home().as_posix())
-            if directory:
-                self.export.setDirectory(directory)
+            save_file, _ = QFileDialog.getSaveFileName(self,
+                                                        "choose save location",
+                                                        Path.home().as_posix(),
+                                                        'Excel Files (*.xlsx)')
+            if save_file:
+                self.export.setSavePath(save_file)
                 save.setText(self.export.getSavePath())
 
 
@@ -441,6 +447,7 @@ def cleanPathName(path):
     """
         path: a string conatining the full path to a file
         Returns a new string by striping a path name so that only the file name remains
+
     """
     i = -1
     while path[i] != '/' and path[i] != '\\':
