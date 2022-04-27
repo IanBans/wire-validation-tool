@@ -40,7 +40,7 @@ class App(QMainWindow):
         self.wire_report_list = QListWidget()
         self.left_widget_layout = QFormLayout()
         self.right_widget_layout = QFormLayout()
-        self.working_directory = Path.home().as_posix()
+        self.working_directory = Path.home()
         self.setupUI()
 
     def setupUI(self):
@@ -324,7 +324,7 @@ class App(QMainWindow):
                         new_index = box.findText(fields[counter])
                         if new_index == - 1:
                             print("Error. Attempting to load csv config that is not compatible"
-                                   " with current wire report excel sheet")
+                                  " with current wire report excel sheet")
                             return
                         box.setCurrentIndex(new_index)
                     return
@@ -402,17 +402,17 @@ class App(QMainWindow):
             container.setLayout(format_selector)
 
             # create widgets and edit settings
-            format_selector.addWidget(PySide2.QtWidgets.QLabel(
-                                                    "Or select saved wire report format"), 0, 2)
+            format_selector.addWidget(QLabel(
+                                            "Or select saved wire report format"), 0, 2)
             combo_box = QComboBox()
             combo_box.addItem("Choose Option")
             for row in self.wire_report_configs.returnAllNames():
                 combo_box.addItem(row)
             combo_box.currentIndexChanged.connect(loadCsvConfig)
-            instructions = PySide2.QtWidgets.QLabel("To save the above column labels for later "
+            instructions = QLabel("To save the above column labels for later "
                 "use, please name this configution and press save")
             instructions.adjustSize()
-            line = PySide2.QtWidgets.QLineEdit()
+            line = QLineEdit()
             line.setPlaceholderText("Enter the name of this configuration")
             line.setMaximumWidth(400)
             line.adjustSize()
@@ -431,9 +431,9 @@ class App(QMainWindow):
             format_selector.addLayout(button_layout, 2, 0)
             format_selector.setSpacing(20)
             format_selector.setMargin(5)
-            draw_line = PySide2.QtWidgets.QFrame()
-            draw_line.setFrameShape(PySide2.QtWidgets.QFrame.VLine)
-            draw_line.setFrameShadow(PySide2.QtWidgets.QFrame.Raised)
+            draw_line = QFrame()
+            draw_line.setFrameShape(QFrame.VLine)
+            draw_line.setFrameShadow(QFrame.Raised)
             format_selector.addWidget(draw_line, 0, 1, 3, 1)
             container.adjustSize()
             container.setMaximumHeight(container.height())

@@ -13,8 +13,17 @@ class CsvConfig:
 
 
     def __init__(self, filename, gui):
-        #tests if the csv file can be opened
         self.filename = filename
+        # tests if the csv file can be opened
+        # if not, create a new one
+        try:
+            with open(self.filename, 'r') as file:
+                file.close()
+        except FileNotFoundError:
+            print("config file not found, creating new one at", self.filename)
+            new_file = open(self.filename, 'w')
+            new_file.close()
+
         self.clean()
         self.gui = gui
 
@@ -128,7 +137,7 @@ class CsvConfig:
         """
         # Record contents of file except the row to be overwritten
         new_csv = []
-        with open(self.csv_filename, "r", newline="") as file:
+        with open(self.filename, "r", newline="") as file:
             reader = csv.reader(file)
             for row in reader:
                 if not row:
