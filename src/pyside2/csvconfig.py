@@ -1,5 +1,6 @@
 import csv
 
+
 class CsvConfig:
     """
             Class: Reads and writes to the csv file with all the saved wire report configurations
@@ -10,7 +11,6 @@ class CsvConfig:
                 remove(name): remove the row that begins with name from the csv file
                     returns 0 on failure and 1 on success
         """
-
 
     def __init__(self, filename, gui):
         self.filename = filename
@@ -68,7 +68,7 @@ class CsvConfig:
             with open(self.filename, "w+", newline='') as file:
                 writer = csv.writer(file)
                 writer.writerows(new_csv)
-        except:
+        except FileNotFoundError:
             print("error deleting entry")
             return 0
         return 1
@@ -107,8 +107,11 @@ class CsvConfig:
                     writer.writerow(new_row)
 
             return 1
-        except:
-            print("failure adding new row")
+        except FileNotFoundError:
+            print("failure adding new row, file not found")
+            return 0
+        except PermissionError:
+            print("error adding new row, permission denied")
             return 0
 
     def returnAllNames(self):
@@ -127,9 +130,9 @@ class CsvConfig:
                         continue
                     names.append(row[0])
             return names
-        except:
-            print("error reading csv file")
-        return
+        except FileNotFoundError:
+            print("error reading config file at", self.filename)
+            return names
 
     def clean(self):
         """
