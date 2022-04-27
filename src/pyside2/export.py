@@ -1,8 +1,9 @@
+from os import path
+from pathlib import Path
 from openpyxl import Workbook
 from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
 from openpyxl.utils import get_column_letter
-from os import path
-from pathlib import Path
+
 
 class ExportManager:
     """
@@ -14,7 +15,6 @@ class ExportManager:
             exportToExcel(file_path, rows): writes rows to an excel worksheet
                 at file_path
     """
-
 
     def __init__(self, gui):
         self.save_path = path.normpath(path.join(Path.home().as_posix(), "output.xlsx"))
@@ -29,6 +29,9 @@ class ExportManager:
             self.save_path = str(file_path) + ".xlsx"
 
     def getSavePath(self):
+        """
+        getter for save_path property
+        """
         return self.save_path
 
     def exportToExcel(self, rows):
@@ -38,7 +41,6 @@ class ExportManager:
                 or tuple of tuples). Each element in the outer collection will
                 be read as a row to be written to the worksheet.
         """
-
 
         # create workbook
         workb = Workbook()

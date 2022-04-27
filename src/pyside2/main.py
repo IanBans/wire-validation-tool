@@ -3,7 +3,7 @@ from pathlib import Path
 from os.path import dirname, basename
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
-from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QCheckBox, QHBoxLayout
+from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QHBoxLayout
 from PySide2.QtGui import Qt, QPalette, QColor, QBrush
 from openpyxl import load_workbook
 from inputparser import InputParser
@@ -40,7 +40,7 @@ class App(QMainWindow):
         self.wire_report_list = QListWidget()
         self.left_widget_layout = QFormLayout()
         self.right_widget_layout = QFormLayout()
-        self.working_directory = Path.home()
+        self.working_directory = Path.home().as_posix()
         self.setupUI()
 
     def setupUI(self):
@@ -116,7 +116,6 @@ class App(QMainWindow):
             else:
                 self.right_widget_layout.addRow(label, remove_button)
 
-
         def openCSVFileDialog():
             """
                 opens the file picker to select .csv files
@@ -125,9 +124,9 @@ class App(QMainWindow):
             """
 
             filenames, _ = QFileDialog.getOpenFileNames(self,
-                                                       'Choose file',
-                                                       self.working_directory,
-                                                       'CSV Files (*.csv)')
+                                                        'Choose file',
+                                                        self.working_directory,
+                                                        'CSV Files (*.csv)')
             for file in filenames:
                 if file not in self.pdc_paths:
                     self.pdc_paths.append(file)
@@ -139,7 +138,6 @@ class App(QMainWindow):
             if filenames:
                 self.working_directory = dirname(filenames[0])
 
-
         def openExcelFileDialog():
             """
                 opens the file picker sorted to .xlsx files
@@ -147,9 +145,9 @@ class App(QMainWindow):
                 the wire report lists and GUI
             """
             filenames, _ = QFileDialog.getOpenFileNames(self,
-                                                       'Choose file',
-                                                       self.working_directory,
-                                                       'Excel Files (*.xlsx)')
+                                                        'Choose file',
+                                                        self.working_directory,
+                                                        'Excel Files (*.xlsx)')
 
             for file in filenames:
                 if file not in self.wire_report_paths:
@@ -170,13 +168,12 @@ class App(QMainWindow):
                 adds save path to GUI
             """
             save_file, _ = QFileDialog.getSaveFileName(self,
-                                                        "choose save location",
-                                                        Path.home().as_posix(),
-                                                        'Excel Files (*.xlsx)')
+                                                       "choose save location",
+                                                       Path.home().as_posix(),
+                                                       'Excel Files (*.xlsx)')
             if save_file:
                 self.export.setSavePath(save_file)
                 save.setText(self.export.getSavePath())
-
 
         file_picker_widgets = QWidget()
         file_picker_layout = QGridLayout()
@@ -267,10 +264,9 @@ class App(QMainWindow):
             if button_dict[index][3].findText(button_dict[index][0].text()) != -1:
                 return
             # update each combobox holding configs
-            for x in button_dict.keys():
-                button_dict[x][3].addItem(button_dict[index][0].text())
-                button_dict[x][3].update()
-
+            for key, _ in button_dict.items():
+                button_dict[key][3].addItem(button_dict[index][0].text())
+                button_dict[key][3].update()
 
         def deleteNewConfig(button_dict):
             """
@@ -279,9 +275,10 @@ class App(QMainWindow):
                     line: QlineEdit contains the name of the config to be deleted
                     save: save button that is enabled by this method
                     delete: button that deletes config
-                    combo_box: conatins all saved csv configs. contents get updated in this method
-                Deletes the user specified saved config from the csv file, disables the delete button,
-                and renables the save button and line edit
+                    combo_box: conatins all saved csv configs. contents are
+                               updated in this method
+                Deletes the user specified saved config from the csv file,
+                disables the delete button, and renables the save button and line edit
             """
             index = self.wire_report_list.currentRow()
             self.wire_report_configs.delete(button_dict[index][0].text())
@@ -292,13 +289,13 @@ class App(QMainWindow):
             button_dict[index][2].setEnabled(False)
 
             # update each combobox holding configs
-            for x in button_dict.keys():
-                box_to_remove = button_dict[x][3].findText(button_dict[index][0].text())
+            for key in button_dict.keys():
+                box_to_remove = button_dict[key][3].findText(button_dict[index][0].text())
                 # if the item is not in the combobox skip
                 if box_to_remove == -1:
                     continue
-                button_dict[x][3].removeItem(box_to_remove)
-                button_dict[x][3].update()
+                button_dict[key][3].removeItem(box_to_remove)
+                button_dict[key][3].update()
 
         def loadCsvConfig():
             """
@@ -312,7 +309,7 @@ class App(QMainWindow):
             if csv_config_buttons[index][3].currentIndex() == 0:
                 return
             # look for the correct wire report
-            for report in combo_box_dict.keys():
+            for report, _ in combo_box_dict.items():
                 if layer in report:
                     # load data from csv
                     fields = self.wire_report_configs.search(
@@ -395,22 +392,21 @@ class App(QMainWindow):
 
         # create new widget for each wire report that manages wire csv configs
         # Each widget is stacked on each other in wire_csv_stacked_widget
-        for x in range(self.wire_report_list.count()):
+        for item in range(self.wire_report_list.count()):
             container = QWidget()
             wire_csv_stacked_widget.addWidget(container)
             format_selector = QGridLayout()
             container.setLayout(format_selector)
 
             # create widgets and edit settings
-            format_selector.addWidget(QLabel(
-                                            "Or select saved wire report format"), 0, 2)
+            format_selector.addWidget(QLabel("Or select saved wire report format"), 0, 2)
             combo_box = QComboBox()
             combo_box.addItem("Choose Option")
             for row in self.wire_report_configs.returnAllNames():
                 combo_box.addItem(row)
             combo_box.currentIndexChanged.connect(loadCsvConfig)
             instructions = QLabel("To save the above column labels for later "
-                "use, please name this configution and press save")
+                                  "use, please name this configution and press save")
             instructions.adjustSize()
             line = QLineEdit()
             line.setPlaceholderText("Enter the name of this configuration")
@@ -419,7 +415,7 @@ class App(QMainWindow):
             save_button = QPushButton("Save")
             delete_button = QPushButton("Delete")
             delete_button.setEnabled(False)
-            csv_config_buttons.update({x : [line, save_button, delete_button, combo_box]})
+            csv_config_buttons.update({item: [line, save_button, delete_button, combo_box]})
 
             # add widgets to container and fix formatting
             format_selector.addWidget(combo_box, 1, 2)
@@ -439,8 +435,9 @@ class App(QMainWindow):
             container.setMaximumHeight(container.height())
 
         # create event listeners for each save and delete button
-        for key in csv_config_buttons.keys():
-            csv_config_buttons[key][1].clicked.connect(lambda: saveNewConfig(csv_config_buttons, combo_box_dict))
+        for key, _ in csv_config_buttons.items():
+            csv_config_buttons[key][1].clicked.connect(
+                lambda: saveNewConfig(csv_config_buttons, combo_box_dict))
             csv_config_buttons[key][2].clicked.connect(lambda: deleteNewConfig(csv_config_buttons))
 
         # create the comboboxes that user uses to specify column names
@@ -482,6 +479,7 @@ class App(QMainWindow):
 
         submit.clicked.connect(makeDict)
         submit.clicked.connect(sendReports)
+
 
 def reportError(error_code):
     """
