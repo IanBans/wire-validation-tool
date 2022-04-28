@@ -18,14 +18,21 @@ class App(QMainWindow):
        Fields:
         parser: input parser object to get input from files
         graph: GraphManager instance to store data into.
+        export: ExportManager instance to handle Excel writing
         stacked_widget: the main window container
+        wire_report_paths: holds all report paths selected by user
+        pdc_paths: holds all pdc filepaths selected by user
+        wire_report_configs: manages saving and loading of
+            column configurations
+        working_directory: the current working directory of the file pickers
        Methods:
         setupUI(): creates the UI structure and elements
         readColumnNames(): helper function to fill the column drop down lists
         goToPage(): sets stacked_widget page to target
         setupFilePage(): sets up file picker page
         setupWireReports(): sets up column picker for each report
-        readColumnNames(): helper function for wire report dropdowns
+        readColumnNames(): helper function to read the header of each report
+            and populate dropdowns
     """
     # sets up UI and create parser and GraphManager instances
     def __init__(self):
@@ -124,7 +131,7 @@ class App(QMainWindow):
             """
 
             filenames, _ = QFileDialog.getOpenFileNames(self,
-                                                        'Choose file',
+                                                        'Choose PDC file to load',
                                                         self.working_directory,
                                                         'CSV Files (*.csv)')
             for file in filenames:
@@ -145,7 +152,7 @@ class App(QMainWindow):
                 the wire report lists and GUI
             """
             filenames, _ = QFileDialog.getOpenFileNames(self,
-                                                        'Choose file',
+                                                        'Choose wire report to load',
                                                         self.working_directory,
                                                         'Excel Files (*.xlsx)')
 
@@ -168,7 +175,7 @@ class App(QMainWindow):
                 adds save path to GUI
             """
             save_file, _ = QFileDialog.getSaveFileName(self,
-                                                       "choose save location",
+                                                       "Choose save location for trace file",
                                                        Path.home().as_posix(),
                                                        'Excel Files (*.xlsx)')
             if save_file:
@@ -230,7 +237,7 @@ class App(QMainWindow):
                 # read combox_dict
                 report_list = []
                 for box in value:
-                    report_list.append(box.currentText())
+                    report_list.append(box.currentIndex()-1)
 
                 wire_report_dict.update({key: report_list})
             print(wire_report_dict)
@@ -253,7 +260,7 @@ class App(QMainWindow):
             for key in combo_box_dict.keys():
                 if self.wire_report_list.currentItem().text() in key:
                     for value in combo_box_dict[key]:
-                        new_config.append(value.currentText())
+                        new_config.append(value.currentIndex())
                     break
             self.wire_report_configs.add(new_config)
             # deactivate buttons to edit and activate button that deletes
@@ -314,12 +321,11 @@ class App(QMainWindow):
                     # load data from csv
                     fields = self.wire_report_configs.search(
                         csv_config_buttons[index][3].currentText())
+                    del fields[0]
                     # for each box, change index to new_index
-                    counter = 0
-                    for box in combo_box_dict[report]:
-                        counter += 1
-                        new_index = box.findText(fields[counter])
-                        if new_index == - 1:
+                    for box, field in zip(combo_box_dict[report], fields):
+                        new_index = int(field)
+                        if new_index > box.count():
                             print("Error. Attempting to load configuration that is not compatible"
                                   " with current wire report excel sheet")
                             return
