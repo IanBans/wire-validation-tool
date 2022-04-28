@@ -60,12 +60,12 @@ class Report:
                     row_list = list(row)
                     # if row is empty, don't process it
                     if row_list != empty:
-                        row_dict["FROM"] = (row[column_map[self.from_labels[0]]],
-                                            row[column_map[self.from_labels[1]]])
-                        row_dict["TO"] = (row[column_map[self.to_labels[0]]],
-                                          row[column_map[self.to_labels[1]]])
-                        row_dict["CSA"] = row[column_map[self.csa]]
-                        row_dict["DESC"] = row[column_map[self.desc]]
+                        row_dict["FROM"] = (row[self.from_labels[0]],
+                                            row[self.from_labels[1]])
+                        row_dict["TO"] = (row[self.to_labels[0]],
+                                          row[self.to_labels[1]])
+                        row_dict["CSA"] = row[self.csa]
+                        row_dict["DESC"] = row[self.desc]
                         self.sheet_list.append(row_dict)
                 print("successfully read report: ", self.filename)
                 return self.sheet_list
@@ -73,4 +73,4 @@ class Report:
                 print("check column label " + str(error) + " matches file")
                 return []
         else:
-            print("bad filename in Report.read")
+            print("could not find a file at", self.filepath)
