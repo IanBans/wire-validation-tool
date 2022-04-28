@@ -39,19 +39,9 @@ class Report:
             reads the report from filepath and stores output in sheet_list, or empty list if
             reading unsuccessful
         """
-        # maps column names to column numbers for identification
-        def mapColumnNames(report):
-            names = {}
-            for first_row in report.iter_rows(1, 1, 1, sheet.max_column, True):
-                row = first_row
-            for num in range(0, sheet.max_column):
-                names[row[num]] = num
-            return names
-
         if self.filepath:
             workb = load_workbook(self.filepath, read_only=True)
             sheet = workb.active
-            column_map = mapColumnNames(sheet)
             # creates a list of NoneType to check for empty rows
             empty = [None] * sheet.max_column
             try:
