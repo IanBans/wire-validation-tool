@@ -320,7 +320,7 @@ class App(QMainWindow):
                         counter += 1
                         new_index = box.findText(fields[counter])
                         if new_index == - 1:
-                            print("Error. Attempting to load csv config that is not compatible"
+                            print("Error. Attempting to load configuration that is not compatible"
                                   " with current wire report excel sheet")
                             return
                         box.setCurrentIndex(new_index)
@@ -492,7 +492,7 @@ def reportError(error_code):
 def readColumnNames(filename):
     """
         filename: full file path of report file
-        gets first line of worksheet
+        gets first full line of worksheet
         and returns it as a list
         helper function for UI drop down boxes
     """
@@ -500,21 +500,10 @@ def readColumnNames(filename):
     if filename:
         workb = load_workbook(filename, read_only=True)
         sheet = workb.active
-        for first_row in sheet.iter_rows(1, 1, 1, sheet.max_column, True):
-            names = list(first_row)
+        for row in sheet.iter_rows(1, sheet.max_row, 1, sheet.max_column, True):
+            if None not in row:
+                return list(row)
     return names
-
-
-def cleanPathName(path):
-    """
-        path: a string conatining the full path to a file
-        Returns a new string by striping a path name so that only the file name remains
-
-    """
-    i = -1
-    while path[i] != '/' and path[i] != '\\':
-        i = i - 1
-    return path[i + 1:]
 
 
 if __name__ == '__main__':
