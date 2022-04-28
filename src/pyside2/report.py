@@ -64,3 +64,4 @@ class Report:
                 return []
         else:
             print("could not find a file at", self.filepath)
+            return []

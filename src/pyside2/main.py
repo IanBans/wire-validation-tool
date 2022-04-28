@@ -237,7 +237,7 @@ class App(QMainWindow):
                 # read combox_dict
                 report_list = []
                 for box in value:
-                    report_list.append(box.currentIndex()-1)
+                    report_list.append(box.currentIndex() - 1)
 
                 wire_report_dict.update({key: report_list})
             print(wire_report_dict)
@@ -472,7 +472,7 @@ class App(QMainWindow):
 
         # add navigation buttons to the container
         back = QPushButton("Back")
-        back.clicked.connect(lambda: self.goToPage("file_picker"))
+        back.clicked.connect(lambda: onBackButtonClick(self))
         home = QPushButton("Home")
         home.clicked.connect(lambda: self.goToPage("file_picker"))
         home.setMinimumWidth(150)
@@ -485,6 +485,15 @@ class App(QMainWindow):
 
         submit.clicked.connect(makeDict)
         submit.clicked.connect(sendReports)
+
+
+def onBackButtonClick(self):
+    """
+        clicklistener for the 'back' button
+        clears graph and returns to file picker
+    """
+    self.goToPage("file_picker")
+    self.graph.clearGraph()
 
 
 def reportError(error_code):

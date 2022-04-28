@@ -29,6 +29,13 @@ class GraphManager:
         for node in list(self._g.nodes.data()):
             print(node)
 
+    def clearGraph(self):
+        """
+            clears all data from graph
+        """
+        self._g.clear()
+        print("graph is now empty")
+
     def printEdges(self):
         """
             prints all edges in the graph, one per line
