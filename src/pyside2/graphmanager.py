@@ -1,4 +1,5 @@
 import math
+from tokenize import Floatnumber
 import networkx as nx
 
 
@@ -120,8 +121,22 @@ class GraphManager:
                     trace = self.rtraverse(node, nbr, node, {'min_csa': math.inf})
                     for wire in trace:
                         wire[2]["fuse_rating"] = fuse_rating[node]
-                        #if self._heatData:
-                            #wire[2]["heat"] = self._heatData{wire[2]["min_csa"]}{fuse_rating[node]}
+                        if self._heatData:
+                            min_csa = wire[2]["min_csa"]
+                            if min_csa not in self._heatData:
+                                new_min = 0.0
+                                for key in self._heatData.keys():
+                                    if key > new_min and key < min_csa:
+                                        new_min = key
+                                min_csa = new_min
+                            amperage = fuse_rating[node]
+                            if amperage not in self._heatData[min_csa]:
+                                new_amp = 1000000.0
+                                for key in self._heatData[min_csa].keys():
+                                    if key < new_amp and key > amperage:
+                                        new_amp = key
+                                amperage = new_amp
+                            wire[2]["heat"] = self._heatData[min_csa][amperage]
                         tuples += [wire]
         return tuples
 
