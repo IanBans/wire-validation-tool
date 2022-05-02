@@ -412,7 +412,7 @@ class App(QMainWindow):
                 combo_box.addItem(row)
             combo_box.currentIndexChanged.connect(loadCsvConfig)
             instructions = QLabel("To save the above column labels for later "
-                                  "use, please name this configution and press save")
+                                  "use, name the configuration and press save")
             instructions.adjustSize()
             line = QLineEdit()
             line.setPlaceholderText("Enter the name of this configuration")
