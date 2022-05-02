@@ -28,6 +28,13 @@ class InputParser:
             getter for reports
         """
         return self._reports
+    def clearParsedData(self):
+        """
+            deletes all cached parsed data
+        """
+        self._reports.clear()
+        self._pdcs.clear()
+        print("cleared parser data")
 
     def getPDCs(self):
         """
@@ -46,7 +53,6 @@ class InputParser:
             contents_list = []
             with open(filename, mode='rt') as csv_file:
                 pdc_dict = csv.DictReader(csv_file, delimiter=',')
-                print("Successfully opened pdc fuse map..")
                 name = os.path.basename(filename)
                 for line in pdc_dict:
                     contents = {}
@@ -55,6 +61,7 @@ class InputParser:
                     contents_list.append(contents)
                 if name not in self._pdcs:
                     self._pdcs[name] = contents_list
+                    print("Successfully read PDC map: ", name)
                 return contents_list
 
         else:

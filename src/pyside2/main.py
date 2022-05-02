@@ -494,6 +494,7 @@ def onBackButtonClick(self):
     """
     self.goToPage("file_picker")
     self.graph.clearGraph()
+    self.parser.clearParsedData()
 
 
 def reportError(error_code):
