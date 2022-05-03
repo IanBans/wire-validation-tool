@@ -1,5 +1,6 @@
 import csv
 
+
 class CsvConfig:
     """
             Class: Reads and writes to the csv file with all the saved wire report configurations
@@ -11,9 +12,18 @@ class CsvConfig:
                     returns 0 on failure and 1 on success
         """
 
-    def __init__(self, gui):
-        #tests if the csv file can be opened
-        self.csv_filename = "configs.csv"
+    def __init__(self, filename, gui):
+        self.filename = filename
+        # tests if the csv file can be opened
+        # if not, create a new one
+        try:
+            with open(self.filename, 'r') as file:
+                file.close()
+        except FileNotFoundError:
+            print("config file not found, creating new one at", self.filename)
+            new_file = open(self.filename, 'w')
+            new_file.close()
+
         self.clean()
         self.gui = gui
 
@@ -23,7 +33,8 @@ class CsvConfig:
             This method searches the csv file for the row that begins with the given name
             returns a list representing the csv row where each entry is a string object
         """
-        with open(self.csv_filename, "r") as file:
+
+        with open(self.filename, "r") as file:
             reader = csv.reader(file)
             target_row = []
             for row in reader:
@@ -45,7 +56,7 @@ class CsvConfig:
         """
         try:
             # first record orginal contents of text file but exclude the target row
-            with open(self.csv_filename, "r+") as file:
+            with open(self.filename, "r+") as file:
                 reader = csv.reader(file)
                 new_csv = []
                 for row in reader:
@@ -54,10 +65,10 @@ class CsvConfig:
                     if row[0] != name:
                         new_csv.append(row)
             # write new contents to the same file
-            with open(self.csv_filename, "w+", newline='') as file:
+            with open(self.filename, "w+", newline='') as file:
                 writer = csv.writer(file)
                 writer.writerows(new_csv)
-        except:
+        except FileNotFoundError:
             print("error deleting entry")
             return 0
         return 1
@@ -75,7 +86,7 @@ class CsvConfig:
             if self.search(new_row[0]):
                 # Record contents of file except the row to be overwritten
                 new_csv = []
-                with open(self.csv_filename, "r+") as file:
+                with open(self.filename, "r+") as file:
                     reader = csv.reader(file)
                     for row in reader:
                         if not row:
@@ -83,21 +94,24 @@ class CsvConfig:
                         if row[0] != new_row[0]:
                             new_csv.append(row)
 
-                # write new contents to the same row
-                with open(self.csv_filename, "w+", newline='') as file:
+                # write new contents to the same file
+                with open(self.filename, "w+", newline='') as file:
                     writer = csv.writer(file)
                     writer.writerows(new_csv)
                     writer.writerow(new_row)
 
             # Appending new row
             else:
-                with open(self.csv_filename, "a", newline="") as file:
+                with open(self.filename, "a", newline="") as file:
                     writer = csv.writer(file)
                     writer.writerow(new_row)
 
             return 1
-        except:
-            print("failure adding new row")
+        except FileNotFoundError:
+            print("failure adding new row, file not found")
+            return 0
+        except PermissionError:
+            print("error adding new row, permission denied")
             return 0
 
     def returnAllNames(self):
@@ -106,7 +120,7 @@ class CsvConfig:
         """
         try:
             names = []
-            with open(self.csv_filename, "r", newline="") as file:
+            with open(self.filename, "r", newline="") as file:
                 reader = csv.reader(file)
                 for row in reader:
                     if not row:
@@ -116,9 +130,9 @@ class CsvConfig:
                         continue
                     names.append(row[0])
             return names
-        except:
-            print("error reading csv file")
-        return
+        except FileNotFoundError:
+            print("error reading config file at", self.filename)
+            return names
 
     def clean(self):
         """
@@ -126,12 +140,12 @@ class CsvConfig:
         """
         # Record contents of file except the row to be overwritten
         new_csv = []
-        with open(self.csv_filename, "r", newline="") as file:
+        with open(self.filename, "r", newline="") as file:
             reader = csv.reader(file)
             for row in reader:
                 if not row:
                     continue
                 new_csv.append(row)
-        with open(self.csv_filename, "w", newline="") as file:
+        with open(self.filename, "w", newline="") as file:
             writer = csv.writer(file)
             writer.writerows(new_csv)
