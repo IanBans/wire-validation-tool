@@ -13,7 +13,7 @@ class CsvConfig:
 
     def __init__(self, gui):
         #tests if the csv file can be opened
-        self.csv_filename = "test.txt"
+        self.csv_filename = "configs.csv"
         self.clean()
         self.gui = gui
 
