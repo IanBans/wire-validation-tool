@@ -39,7 +39,7 @@ class Report:
             reads the report from filepath and stores output in sheet_list, or empty list if
             reading unsuccessful
         """
-        if self.filepath:
+        try:
             workb = load_workbook(self.filepath, read_only=True)
             sheet = workb.active
             # creates a list of NoneType to check for empty rows
@@ -60,8 +60,8 @@ class Report:
                 print("successfully read report: ", self.filename)
                 return self.sheet_list
             except KeyError as error:
-                print("check column label " + str(error) + " matches file")
+                print("check column number " + str(error) + " is correct")
                 return []
-        else:
-            print("could not find a file at", self.filepath)
+        except FileNotFoundError:
+            print("ERROR: could not find a file at", self.filepath)
             return []
