@@ -3,7 +3,8 @@ from pathlib import Path
 from os.path import dirname, basename
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
-from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QHBoxLayout
+from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QCheckBox, QHBoxLayout
+from PySide2.QtWidgets import QTextEdit
 from PySide2.QtGui import Qt, QPalette, QColor, QBrush
 from openpyxl import load_workbook
 from inputparser import InputParser
@@ -180,7 +181,8 @@ class App(QMainWindow):
                                                        'Excel Files (*.xlsx)')
             if save_file:
                 self.export.setSavePath(save_file)
-                save.setText(self.export.getSavePath())
+                save_label.setText(save_file)
+
 
         file_picker_widgets = QWidget()
         file_picker_layout = QGridLayout()
@@ -191,6 +193,7 @@ class App(QMainWindow):
         pdc_button = QPushButton('Add PDC')
         wire_button = QPushButton('Add Wire Reports')
         save = QPushButton("Choose Where to Save ...")
+        save_label = QLabel()
         save.clicked.connect(openSaveFileDialog)
         self.stacked_widget.addWidget(file_picker_widgets)
         file_picker_widgets.setLayout(file_picker_layout)
@@ -218,6 +221,7 @@ class App(QMainWindow):
         next_button.setEnabled(False)
         file_picker_layout.addWidget(next_button, 2, 0, 2, 2)
         file_picker_layout.addWidget(save, 1, 0, 1, 2)
+        file_picker_layout.addWidget(save_label, 1, 1, 1, 1, Qt.AlignLeft)
         save.setMaximumWidth(200)
         next_button.setMaximumWidth(200)
 
@@ -366,6 +370,8 @@ class App(QMainWindow):
         page_layout = QGridLayout()
         fields_selector = QStackedWidget()
         submit = QPushButton('Submit')
+        submit.setMaximumWidth(200)
+        save_label = QLabel("Save Path: " + self.export.getSavePath())
 
         # the Dictionary that contains all the wire column fields.
         # The key is the wire path and the value is a list of QComboBoxes
@@ -472,16 +478,17 @@ class App(QMainWindow):
 
         # add navigation buttons to the container
         back = QPushButton("Back")
+        page_layout.addWidget(back, 3, 0, 1, 1)
+        page_layout.addWidget(submit, 4, 0, 1, 1)
+        page_layout.addWidget(save_label, 4, 1, 1, 1)
+
+        # for Ian M
+        console_label = QLabel("wire validator status updates:")
+        message_box = QTextEdit()
+        message_box.setPlaceholderText("Something went wrong Error 123")
+        page_layout.addWidget(console_label, 2, 0, 1, 2)
+        page_layout.addWidget(message_box, 3, 0, 1, 2)
         back.clicked.connect(lambda: onBackButtonClick(self))
-        home = QPushButton("Home")
-        home.clicked.connect(lambda: self.goToPage("file_picker"))
-        home.setMinimumWidth(150)
-        home_color = QPalette(QApplication.palette())
-        home_color.setBrush(QPalette.Button, QBrush(QColor(165, 214, 255)))
-        home.setPalette(home_color)
-        page_layout.addWidget(home, 3, 1, Qt.AlignRight)
-        page_layout.addWidget(back, 2, 0, 1, 1)
-        page_layout.addWidget(submit, 3, 0, 1, 1)
 
         submit.clicked.connect(makeDict)
         submit.clicked.connect(sendReports)
