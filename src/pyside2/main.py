@@ -5,6 +5,7 @@ import PySide2.QtWidgets
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
 from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QCheckBox, QHBoxLayout
+from PySide2.QtWidgets import QTextEdit
 from PySide2.QtGui import Qt, QPalette, QColor, QBrush
 from openpyxl import load_workbook
 from inputparser import InputParser
@@ -473,15 +474,15 @@ class App(QMainWindow):
         # add navigation buttons to the container
         back = QPushButton("Back")
         back.clicked.connect(lambda: self.goToPage("file_picker"))
-        home = QPushButton("Home")
-        home.clicked.connect(lambda: self.goToPage("file_picker"))
-        home.setMinimumWidth(150)
-        home_color = QPalette(QApplication.palette())
-        home_color.setBrush(QPalette.Button, QBrush(QColor(165, 214, 255)))
-        home.setPalette(home_color)
-        page_layout.addWidget(home, 3, 1, Qt.AlignRight)
-        page_layout.addWidget(back, 2, 0, 1, 1)
-        page_layout.addWidget(submit, 3, 0, 1, 1)
+        page_layout.addWidget(back, 3, 0, 1, 1)
+        page_layout.addWidget(submit, 4, 0, 1, 1)
+
+        # for Ian M
+        console_label = QLabel("wire validator status updates:")
+        message_box = QTextEdit()
+        message_box.setPlaceholderText("Something went wrong Error 123")
+        page_layout.addWidget(console_label, 2, 0, 1, 2)
+        page_layout.addWidget(message_box, 3, 0, 1, 2)
 
         submit.clicked.connect(makeDict)
         submit.clicked.connect(sendReports)
