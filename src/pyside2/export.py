@@ -18,6 +18,7 @@ class ExportManager:
 
     def __init__(self, gui):
         self.save_path = path.normpath(path.join(Path.home().as_posix(), "output.xlsx"))
+        self.gui = gui
 
     def setSavePath(self, file_path):
         """
@@ -59,5 +60,7 @@ class ExportManager:
             dim_holder[get_column_letter(col)] = ColumnDimension(works, min=col, max=col, width=25)
 
         works.column_dimensions = dim_holder
-        print("saving trace to: ", self.save_path)
+        log = "saving trace to: " + str(self.save_path)
+        print(log)
+        self.gui.reportError(log, "log")
         workb.save(self.save_path)

@@ -14,18 +14,21 @@ class CsvConfig:
 
     def __init__(self, filename, gui):
         self.filename = filename
+        self.gui = gui
         # tests if the csv file can be opened
         # if not, create a new one
         try:
             with open(self.filename, 'r') as file:
                 file.close()
         except FileNotFoundError:
-            print("config file not found, creating new one at", self.filename)
+            log = "config file not found, creating new one at" + str(self.filename)
+            print(log)
+            self.gui.reportError(log, "error")
             new_file = open(self.filename, 'w')
             new_file.close()
 
         self.clean()
-        self.gui = gui
+
 
     def search(self, name):
         """
@@ -70,6 +73,7 @@ class CsvConfig:
                 writer.writerows(new_csv)
         except FileNotFoundError:
             print("error deleting entry")
+            self.gui.reportError("error deleting entry", "error")
             return 0
         return 1
 
@@ -109,9 +113,11 @@ class CsvConfig:
             return 1
         except FileNotFoundError:
             print("failure adding new row, file not found")
+            self.gui.reportError("failure adding new row, file not found", "error")
             return 0
         except PermissionError:
             print("error adding new row, permission denied")
+            self.gui.reportError("error adding new row, permission denied", "error")
             return 0
 
     def returnAllNames(self):
@@ -131,7 +137,9 @@ class CsvConfig:
                     names.append(row[0])
             return names
         except FileNotFoundError:
-            print("error reading config file at", self.filename)
+            log = "error reading config file at" + str(self.filename)
+            print(log)
+            self.gui.reportError(log, "error")
             return names
 
     def clean(self):

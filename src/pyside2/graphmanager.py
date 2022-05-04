@@ -1,3 +1,4 @@
+from email.mime import application
 import math
 import networkx as nx
 
@@ -54,7 +55,11 @@ class GraphManager:
             vconn = row['CONNECTOR'][0]
             vpin = row['CONNECTOR'][1]
             vname = vconn + "|" + vpin
-            vfuse = int(row["FUSE"])
+            try:
+                vfuse = int(row["FUSE"])
+            except:
+                vfuse = 100
+                self.gui.reportError("Missing fuse rating value in PDC. Replaced with 100", "error")
             # if vertex doesn't exist, create it
             if vname not in self._g:
                 self._g.add_node(vname, connector=vconn, pin=vpin, fuse_rating=vfuse)
@@ -63,6 +68,7 @@ class GraphManager:
                 self._g.nodes[vname]['fuse_rating'] = vfuse
 
         print('added pdc to graph')
+        self.gui.reportError("added pdc to graph", "log")
 
     def addReport(self, report):
         """
@@ -99,7 +105,9 @@ class GraphManager:
                 self._g.add_node(tname, connector=tconn, pin=tpin, fuse_rating=-1)
             # create wire between the two components
             self._g.add_edge(fname, tname, wire=wire_desc, csa=wire_csa)
-        print('added ', report.filename, ' to graph')
+        stmt = 'added ' + str(report.filename) + ' to graph'
+        print(stmt)
+        self.gui.reportError(stmt, "log")
 
     def reportCycle(self, pdc):
         """

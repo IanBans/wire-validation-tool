@@ -25,8 +25,8 @@ class Report:
         self.csa = csa
         self.desc = desc
         self.sheet_list = []
-        self.read()
         self.gui = gui
+        self.read()
 
     def getContents(self):
         """
@@ -57,11 +57,16 @@ class Report:
                         row_dict["CSA"] = row[self.csa]
                         row_dict["DESC"] = row[self.desc]
                         self.sheet_list.append(row_dict)
-                print("successfully read report: ", self.filename)
+                log = "successfully read report: " + str(self.filename)
+                print(log)
+                self.gui.reportError(log, "log")
                 return self.sheet_list
             except KeyError as error:
-                print("check column number " + str(error) + " is correct")
+                log = "check column number " + str(error) + " is correct"
+                print(log)
+                self.gui.reportError(log, "error")
                 return []
         except FileNotFoundError:
-            print("ERROR: could not find a file at", self.filepath)
+            log = "ERROR: could not find a file at" + str(self.filepath)
+            print(log, "error")
             return []

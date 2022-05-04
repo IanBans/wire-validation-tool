@@ -61,11 +61,14 @@ class InputParser:
                     contents_list.append(contents)
                 if name not in self._pdcs:
                     self._pdcs[name] = contents_list
-                    print("Successfully read PDC map: ", name)
+                    log = "Successfully read PDC map: " + str(name)
+                    print(log)
+                    self.gui.reportError(log, "log")
                 return contents_list
 
         else:
             print("invalid filename passed to readPDC...")
+            self.gui.reportError("invalid filename passed to readPDC...", "warning")
             return []
 
     def readReport(self, filename, from_labels, to_labels, csa, desc):

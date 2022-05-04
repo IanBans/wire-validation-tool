@@ -51,6 +51,22 @@ class App(QMainWindow):
         self.console_widget = QListWidget()
         self.working_directory = Path.home().as_posix()
         self.setupUI()
+    
+    #TODO change background color based on type
+    def reportError(self, error_code, type):
+        """
+            error_code: string that specifies what type of error recieved
+            used by other modules to report errors encountered
+            type: string labeled "warning", "error", or "log"
+        """
+        item = QListWidgetItem(error_code)
+        
+        color = QBrush()
+        color.setColor('Qt::red')
+        item.setBackground(color)
+        self.console_widget.addItem(item)
+        print(error_code)
+
 
     def setupUI(self):
         """
@@ -483,24 +499,8 @@ class App(QMainWindow):
         page_layout.addWidget(submit, 4, 0, 1, 1)
         page_layout.addWidget(save_label, 4, 1, 1, 1)
 
-        # for Ian M
+        # console scroll box and label
         console_label = QLabel("wire validator status updates:")
-        #message_box = QTextEdit()
-        #message_box.setPlaceholderText("Something went wrong Error 123")
-        item1 = QListWidgetItem("Test1")
-        item2 = QListWidgetItem("Test2")
-        item3 = QListWidgetItem("Test3")
-        item4 = QListWidgetItem("Test4")
-        item5 = QListWidgetItem("Test5")
-        item6 = QListWidgetItem("Test7")
-        item7 = QListWidgetItem("Test5")
-        self.console_widget.addItem(item1)
-        self.console_widget.addItem(item2)
-        self.console_widget.addItem(item3)
-        self.console_widget.addItem(item4)
-        self.console_widget.addItem(item5)
-        self.console_widget.addItem(item6)
-        self.console_widget.addItem(item7)
 
         scroll_bar = QScrollBar(self)
         self.console_widget.setVerticalScrollBar(scroll_bar)
@@ -523,19 +523,6 @@ def onBackButtonClick(self):
     self.parser.clearParsedData()
 
 
-def reportError(self, error_code, type):
-    """
-        error_code: string that specifies what type of error recieved
-        used by other modules to report errors encountered
-        type: string labeled "warning", "error", or "log"
-    """
-    item = QListWidgetItem(error_code)
-    
-    color = QBrush()
-    color.setColor("red")
-    item.setBackground(color)
-    self.console_widget.addItem(item)
-    print(error_code)
 
 def getConsoleWidget(self):
     return self.console_widget
