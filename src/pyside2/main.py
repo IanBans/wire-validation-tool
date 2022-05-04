@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 from os.path import dirname, basename
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
-from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget
+from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget, QScrollBar, QListWidgetItem
 from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QCheckBox, QHBoxLayout
 from PySide2.QtWidgets import QTextEdit
 from PySide2.QtGui import Qt, QPalette, QColor, QBrush
@@ -48,6 +48,7 @@ class App(QMainWindow):
         self.wire_report_list = QListWidget()
         self.left_widget_layout = QFormLayout()
         self.right_widget_layout = QFormLayout()
+        self.console_widget = QListWidget()
         self.working_directory = Path.home().as_posix()
         self.setupUI()
 
@@ -484,10 +485,28 @@ class App(QMainWindow):
 
         # for Ian M
         console_label = QLabel("wire validator status updates:")
-        message_box = QTextEdit()
-        message_box.setPlaceholderText("Something went wrong Error 123")
+        #message_box = QTextEdit()
+        #message_box.setPlaceholderText("Something went wrong Error 123")
+        item1 = QListWidgetItem("Test1")
+        item2 = QListWidgetItem("Test2")
+        item3 = QListWidgetItem("Test3")
+        item4 = QListWidgetItem("Test4")
+        item5 = QListWidgetItem("Test5")
+        item6 = QListWidgetItem("Test7")
+        item7 = QListWidgetItem("Test5")
+        self.console_widget.addItem(item1)
+        self.console_widget.addItem(item2)
+        self.console_widget.addItem(item3)
+        self.console_widget.addItem(item4)
+        self.console_widget.addItem(item5)
+        self.console_widget.addItem(item6)
+        self.console_widget.addItem(item7)
+
+        scroll_bar = QScrollBar(self)
+        self.console_widget.setVerticalScrollBar(scroll_bar)
+
         page_layout.addWidget(console_label, 2, 0, 1, 2)
-        page_layout.addWidget(message_box, 3, 0, 1, 2)
+        page_layout.addWidget(self.console_widget, 3, 0, 1, 2)
         back.clicked.connect(lambda: onBackButtonClick(self))
 
         submit.clicked.connect(makeDict)
@@ -504,12 +523,22 @@ def onBackButtonClick(self):
     self.parser.clearParsedData()
 
 
-def reportError(error_code):
+def reportError(self, error_code, type):
     """
-    error_code: specifies what type of error recieved
-    used by other modules to report errors encountered
+        error_code: string that specifies what type of error recieved
+        used by other modules to report errors encountered
+        type: string labeled "warning", "error", or "log"
     """
+    item = QListWidgetItem(error_code)
+    
+    color = QBrush()
+    color.setColor("red")
+    item.setBackground(color)
+    self.console_widget.addItem(item)
     print(error_code)
+
+def getConsoleWidget(self):
+    return self.console_widget
 
 
 def readColumnNames(filename):
