@@ -28,6 +28,7 @@ class InputParser:
             getter for reports
         """
         return self._reports
+
     def clearParsedData(self):
         """
             deletes all cached parsed data

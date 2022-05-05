@@ -2,10 +2,10 @@ import sys
 from pathlib import Path
 from os.path import dirname, basename
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
-from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton, QListWidget, QScrollBar, QListWidgetItem
-from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QCheckBox, QHBoxLayout
-from PySide2.QtWidgets import QTextEdit
-from PySide2.QtGui import Qt, QPalette, QColor, QBrush
+from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton
+from PySide2.QtWidgets import QListWidget, QScrollBar, QListWidgetItem
+from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QHBoxLayout
+from PySide2.QtGui import Qt, QBrush
 from openpyxl import load_workbook
 from inputparser import InputParser
 from export import ExportManager
@@ -51,22 +51,27 @@ class App(QMainWindow):
         self.console_widget = QListWidget()
         self.working_directory = Path.home().as_posix()
         self.setupUI()
-    
-    #TODO change background color based on type
-    def reportError(self, error_code, type):
+
+    def getConsoleWidget(self):
+        """
+            getter for the console_widget
+        """
+        return self.console_widget
+
+    # TODO change background color based on type
+    def reportError(self, error_code, error_type):
         """
             error_code: string that specifies what type of error recieved
             used by other modules to report errors encountered
-            type: string labeled "warning", "error", or "log"
+            error_type: string labeled "warning", "error", or "log"
         """
         item = QListWidgetItem(error_code)
-        
+
         color = QBrush()
         color.setColor('Qt::red')
         item.setBackground(color)
         self.console_widget.addItem(item)
-        print(error_code)
-
+        print(error_code, error_type)
 
     def setupUI(self):
         """
@@ -199,7 +204,6 @@ class App(QMainWindow):
             if save_file:
                 self.export.setSavePath(save_file)
                 save_label.setText(save_file)
-
 
         file_picker_widgets = QWidget()
         file_picker_layout = QGridLayout()
@@ -521,11 +525,6 @@ def onBackButtonClick(self):
     self.goToPage("file_picker")
     self.graph.clearGraph()
     self.parser.clearParsedData()
-
-
-
-def getConsoleWidget(self):
-    return self.console_widget
 
 
 def readColumnNames(filename):

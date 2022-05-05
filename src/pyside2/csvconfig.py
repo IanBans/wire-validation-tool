@@ -23,12 +23,10 @@ class CsvConfig:
         except FileNotFoundError:
             log = "config file not found, creating new one at" + str(self.filename)
             print(log)
-            self.gui.reportError(log, "error")
             new_file = open(self.filename, 'w')
             new_file.close()
 
         self.clean()
-
 
     def search(self, name):
         """

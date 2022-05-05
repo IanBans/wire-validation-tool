@@ -1,4 +1,3 @@
-from email.mime import application
 import math
 import networkx as nx
 
@@ -55,11 +54,10 @@ class GraphManager:
             vconn = row['CONNECTOR'][0]
             vpin = row['CONNECTOR'][1]
             vname = vconn + "|" + vpin
-            try:
-                vfuse = int(row["FUSE"])
-            except:
-                vfuse = 100
-                self.gui.reportError("Missing fuse rating value in PDC. Replaced with 100", "error")
+            vfuse = int(row.get("FUSE", 10000))
+            if vfuse == 10000:
+                err_str = "Missing fuse rating value in PDC. Replaced with 10000", "error"
+                self.gui.reportError(err_str)
             # if vertex doesn't exist, create it
             if vname not in self._g:
                 self._g.add_node(vname, connector=vconn, pin=vpin, fuse_rating=vfuse)
