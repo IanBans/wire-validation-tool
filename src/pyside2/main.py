@@ -351,8 +351,10 @@ class App(QMainWindow):
                     for box, field in zip(combo_box_dict[report], fields):
                         new_index = int(field)
                         if new_index > box.count():
-                            self.reportError("Error. Attempting to load configuration that is not compatible"
-                                  " with current wire report excel sheet", "error")
+                            log_msg = ("ERROR: loading configuration that is not compatible"
+                                       " with current wire report."
+                                       " Choose a different configuration")
+                            self.reportError(log_msg, "error")
                             return
                         box.setCurrentIndex(new_index)
                     return
