@@ -111,13 +111,13 @@ class GraphManager:
         """
             Arguments:
                 pdc: node in the graph to check for cycle
-            checks for a cycle within the graph from 'pdc' source.
+            Checks for a cycle within the graph from 'pdc' source.
             if one exists, gets minimum CSA, wires, and splice points.
             returns False if no cycle, or tuple with cycle information
             and the set of wires traversed.
             output format:
             (startComponent|startPin, endComponent|endPin, min_csa, wire1, wire2, ..., wire_n,
-            splice1, splice2, etc), set_of_wires
+            splice1, splice2, etc), set_of_wires_traversed
         """
         # tracks the minimum CSA, wire names, and splices
         # across each wire trace
@@ -139,7 +139,11 @@ class GraphManager:
                     nodes_list.append(value)
                     loop[key] = nodes_list
 
+            # if the start of the loop is a
+            # splice, don't record the loop
             loop_head = list(loop)[0]
+            if loop_head[0] == 'S':
+                return False
             while search:
                 for start, ends in loop.items():
                     search = False
