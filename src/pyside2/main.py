@@ -351,22 +351,24 @@ class App(QMainWindow):
                     for box, field in zip(combo_box_dict[report], fields):
                         new_index = int(field)
                         if new_index > box.count():
-                            print("Error. Attempting to load configuration that is not compatible"
-                                  " with current wire report excel sheet")
+                            self.reportError("Error. Attempting to load configuration that is not compatible"
+                                  " with current wire report excel sheet", "error")
                             return
                         box.setCurrentIndex(new_index)
                     return
 
         def sendReports():
             """
-                send reports to input Parser
-                & print current graph data
+                parses reports and pdcs
+                saves trace to export location
             """
+
             # send pdc to input parser
             for path in self.pdc_paths:
                 if path:
                     self.parser.readPDC(path)
 
+            # parse wire reports
             for path, fields in wire_report_dict.items():
                 from_tuple = (fields[0], fields[1])
                 to_tuple = (fields[2], fields[3])
@@ -377,6 +379,8 @@ class App(QMainWindow):
             for report in self.parser.getReports():
                 self.graph.addReport(report)
             self.export.exportToExcel(self.graph.traceWires())
+            self.parser.clearParsedData()
+            self.graph.clearGraph()
 
         # this list contains all the column fields names
         # necessary for reading the input
@@ -511,20 +515,10 @@ class App(QMainWindow):
 
         page_layout.addWidget(console_label, 2, 0, 1, 2)
         page_layout.addWidget(self.console_widget, 3, 0, 1, 2)
-        back.clicked.connect(lambda: onBackButtonClick(self))
+        back.clicked.connect(lambda: self.goToPage("file_picker"))
 
         submit.clicked.connect(makeDict)
         submit.clicked.connect(sendReports)
-
-
-def onBackButtonClick(self):
-    """
-        clicklistener for the 'back' button
-        clears graph and returns to file picker
-    """
-    self.goToPage("file_picker")
-    self.graph.clearGraph()
-    self.parser.clearParsedData()
 
 
 def readColumnNames(filename):
