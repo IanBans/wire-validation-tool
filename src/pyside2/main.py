@@ -5,7 +5,7 @@ from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout,
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton
 from PySide2.QtWidgets import QListWidget, QScrollBar, QListWidgetItem
 from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QHBoxLayout
-from PySide2.QtGui import Qt, QBrush
+from PySide2.QtGui import Qt, QBrush, QPalette, QColor
 from openpyxl import load_workbook
 from inputparser import InputParser
 from export import ExportManager
@@ -66,10 +66,14 @@ class App(QMainWindow):
             error_type: string labeled "warning", "error", or "log"
         """
         item = QListWidgetItem(error_code)
-
-        color = QBrush()
-        color.setColor('Qt::red')
-        item.setBackground(color)
+        if error_type == 'error':
+            print_color = QColor(255, 0, 0)
+        elif error_type == 'warning':
+            print_color = QColor(246, 190, 0)
+        else:
+            print_color = QColor(0, 0, 0)
+            
+        item.setTextColor(print_color)
         self.console_widget.addItem(item)
         print(error_code, error_type)
 

@@ -56,8 +56,8 @@ class GraphManager:
             vname = vconn + "|" + vpin
             vfuse = int(row.get("FUSE", 10000))
             if vfuse == 10000:
-                err_str = "Missing fuse rating value in PDC. Replaced with 10000", "error"
-                self.gui.reportError(err_str)
+                err_str = "Missing fuse rating value in PDC. Replaced with 10000 at " + str(row)
+                self.gui.reportError(err_str, 'error')
             # if vertex doesn't exist, create it
             if vname not in self._g:
                 self._g.add_node(vname, connector=vconn, pin=vpin, fuse_rating=vfuse)
