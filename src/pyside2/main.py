@@ -79,8 +79,8 @@ class App(QMainWindow):
         """
         # the stacked widget is the app container that swaps which widget is shown
         # Each widget is a page
-        self.stacked_widget.setMinimumSize(500, 300)
-        self.stacked_widget.resize(700, 400)
+        self.stacked_widget.setMinimumSize(800, 500)
+        self.stacked_widget.resize(800, 500)
         self.stacked_widget.setWindowTitle('Paccar Wire Validation Tool')
         # self.pages collects all created pages for navigation
         self.pages = {}
@@ -203,7 +203,7 @@ class App(QMainWindow):
                                                        'Excel Files (*.xlsx)')
             if save_file:
                 self.export.setSavePath(save_file)
-                save_label.setText(save_file)
+                save_label.setText(self.export.getSavePath())
 
         file_picker_widgets = QWidget()
         file_picker_layout = QGridLayout()
@@ -505,9 +505,12 @@ class App(QMainWindow):
 
         # add navigation buttons to the container
         back = QPushButton("Back")
-        page_layout.addWidget(back, 3, 0, 1, 1)
-        page_layout.addWidget(submit, 4, 0, 1, 1)
-        page_layout.addWidget(save_label, 4, 1, 1, 1)
+        back.setMaximumWidth(200)
+        nav_buttons = QHBoxLayout()
+        nav_buttons.addWidget(submit)
+        nav_buttons.addWidget(back)
+        nav_buttons.addWidget(save_label)
+        page_layout.addLayout(nav_buttons, 4, 0, 1, 1)
 
         # console scroll box and label
         console_label = QLabel("wire validator status updates:")
