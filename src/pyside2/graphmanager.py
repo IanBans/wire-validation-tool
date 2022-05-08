@@ -49,15 +49,18 @@ class GraphManager:
             Adds data from a fuse map list to the graph.
             updates fuse_rating attribute if nodes already exist
         """
-        for row in pdc_list:
+        for i,row in enumerate(pdc_list):
             # get vertex information
             vconn = row['CONNECTOR'][0]
             vpin = row['CONNECTOR'][1]
             vname = vconn + "|" + vpin
-            vfuse = int(row.get("FUSE", 10000))
-            if vfuse == 10000:
-                err_str = "Missing fuse rating value in PDC. Replaced with 10000 at " + str(row)
+            try:
+                vfuse = int(row['FUSE'])
+            except ValueError or TypeError:
+                vfuse = 10000
+                err_str = "Fuse value at line " + str(i+2) + " should be a number"
                 self.gui.reportError(err_str, 'error')
+                return False
             # if vertex doesn't exist, create it
             if vname not in self._g:
                 self._g.add_node(vname, connector=vconn, pin=vpin, fuse_rating=vfuse)

@@ -55,16 +55,24 @@ class InputParser:
             with open(filename, mode='rt') as csv_file:
                 pdc_dict = csv.DictReader(csv_file, delimiter=',')
                 name = os.path.basename(filename)
-                for line in pdc_dict:
+                for i, line in enumerate(pdc_dict):
                     contents = {}
-                    contents["CONNECTOR"] = (line["CONNECTOR"], line["PIN"])
-                    contents["FUSE"] = line["FUSE RATING"]
-                    if contents["FUSE"] == '':
-                        contents["FUSE"] = 10000
+                    if line["CONNECTOR"] and line["PIN"]:
+                         contents["CONNECTOR"] = (line["CONNECTOR"], line["PIN"])
+                    else:
+                        err_str = "Missing connector or pin information at line " + str(i+2) + " in file " + str(name)
+                        self.gui.reportError(err_str, "error")
+                        return -1
+                    if line["FUSE RATING"]:
+                        contents["FUSE"] = line["FUSE RATING"]
+                    else:
+                        err_str = "Missing fuse rating value at line " + str(i+2) + " in file " + str(name)
+                        self.gui.reportError(err_str, 'error')
+                        return False
                     contents_list.append(contents)
                 if name not in self._pdcs:
                     self._pdcs[name] = contents_list
-                    log = "Successfully read PDC map: " + str(name)
+                    log = "successfully read PDC map: " + str(name)
                     print(log)
                     self.gui.reportError(log, "log")
                 return contents_list
@@ -72,7 +80,7 @@ class InputParser:
         else:
             print("invalid filename passed to readPDC...")
             self.gui.reportError("invalid filename passed to readPDC...", "warning")
-            return []
+            return False
 
     def readReport(self, filename, from_labels, to_labels, csa, desc):
         """

@@ -67,6 +67,6 @@ class Report:
                 self.gui.reportError(log, "error")
                 return []
         except FileNotFoundError:
-            log = "ERROR: could not find a file at" + str(self.filepath)
+            log = "Could not find a file at" + str(self.filepath)
             print(log, "error")
             return []
