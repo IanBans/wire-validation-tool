@@ -5,7 +5,7 @@ from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout,
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton
 from PySide2.QtWidgets import QListWidget, QScrollBar, QListWidgetItem
 from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QHBoxLayout
-from PySide2.QtGui import Qt, QBrush, QPalette, QColor
+from PySide2.QtGui import Qt, QColor
 from openpyxl import load_workbook
 from inputparser import InputParser
 from export import ExportManager
@@ -58,7 +58,6 @@ class App(QMainWindow):
         """
         return self.console_widget
 
-    # TODO change background color based on type
     def reportError(self, error_code, error_type):
         """
             error_code: string that specifies what type of error recieved
@@ -72,7 +71,7 @@ class App(QMainWindow):
             print_color = QColor(246, 190, 0)
         else:
             print_color = QColor(0, 0, 0)
-            
+
         item.setTextColor(print_color)
         self.console_widget.addItem(item)
         print(error_code, error_type)

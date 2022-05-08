@@ -58,22 +58,23 @@ class InputParser:
                 for i, line in enumerate(pdc_dict):
                     contents = {}
                     if line["CONNECTOR"] and line["PIN"]:
-                         contents["CONNECTOR"] = (line["CONNECTOR"], line["PIN"])
+                        contents["CONNECTOR"] = (line["CONNECTOR"], line["PIN"])
                     else:
-                        err_str = "Missing connector or pin information at line " + str(i+2) + " in file " + str(name)
+                        err_str = ("Missing connector or pin information "
+                                   "at line " + str(i + 2) + " in file " + str(name))
                         self.gui.reportError(err_str, "error")
-                        return -1
+                        return False
                     if line["FUSE RATING"]:
                         contents["FUSE"] = line["FUSE RATING"]
                     else:
-                        err_str = "Missing fuse rating value at line " + str(i+2) + " in file " + str(name)
+                        err_str = ("Missing fuse rating value "
+                                   "at line " + str(i + 2) + " in file " + str(name))
                         self.gui.reportError(err_str, 'error')
                         return False
                     contents_list.append(contents)
                 if name not in self._pdcs:
                     self._pdcs[name] = contents_list
                     log = "successfully read PDC map: " + str(name)
-                    print(log)
                     self.gui.reportError(log, "log")
                 return contents_list
 

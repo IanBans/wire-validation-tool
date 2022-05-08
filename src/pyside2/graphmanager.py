@@ -49,18 +49,19 @@ class GraphManager:
             Adds data from a fuse map list to the graph.
             updates fuse_rating attribute if nodes already exist
         """
-        for i,row in enumerate(pdc_list):
+        for i, row in enumerate(pdc_list):
             # get vertex information
             vconn = row['CONNECTOR'][0]
             vpin = row['CONNECTOR'][1]
             vname = vconn + "|" + vpin
             try:
                 vfuse = int(row['FUSE'])
-            except ValueError or TypeError:
+            except (ValueError, TypeError):
                 vfuse = 10000
-                err_str = "Fuse value at line " + str(i+2) + " should be a number"
+                err_str = "Fuse rating at line " + str(i + 2) + " should be a number"
                 self.gui.reportError(err_str, 'error')
                 return False
+
             # if vertex doesn't exist, create it
             if vname not in self._g:
                 self._g.add_node(vname, connector=vconn, pin=vpin, fuse_rating=vfuse)
@@ -68,8 +69,8 @@ class GraphManager:
             else:
                 self._g.nodes[vname]['fuse_rating'] = vfuse
 
-        print('added pdc to graph')
         self.gui.reportError("added pdc to graph", "log")
+        return True
 
     def addReport(self, report):
         """
@@ -107,7 +108,6 @@ class GraphManager:
             # create wire between the two components
             self._g.add_edge(fname, tname, wire=wire_desc, csa=wire_csa)
         stmt = 'added ' + str(report.filename) + ' to graph'
-        print(stmt)
         self.gui.reportError(stmt, "log")
 
     def reportCycle(self, pdc):
