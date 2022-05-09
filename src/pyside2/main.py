@@ -276,8 +276,8 @@ class App(QMainWindow):
                     line: QlineEdit contains the name of the config to be deleted
                     save: save button that is enabled by this method
                     delete: button that deletes config
-                    combo_box: conatins all saved csv configs. contents get updated in this method
-                combo_boxe_dict: dictionary of wire report names paired with a list of combo boxes
+                    combo_box: contains all saved csv configs. contents get updated in this method
+                combo_box_dict: dictionary of wire report names paired with a list of combo boxes
                     that describe what each column is named
                 Update the csv file to include another wire report config
                     enables the delete button,and disables the save button and line edit
@@ -290,11 +290,18 @@ class App(QMainWindow):
                     for value in combo_box_dict[key]:
                         new_config.append(value.currentIndex())
                     break
-            self.wire_report_configs.add(new_config)
-            # deactivate buttons to edit and activate button that deletes
-            button_dict[index][0].setEnabled(False)
-            button_dict[index][1].setEnabled(False)
-            button_dict[index][2].setEnabled(True)
+            # add config if it's name is not empty
+            # throw error otherwise
+            if len(new_config[0]) > 0:
+                self.wire_report_configs.add(new_config)
+                # deactivate buttons to edit and activate button that deletes
+                button_dict[index][0].setEnabled(False)
+                button_dict[index][1].setEnabled(False)
+                button_dict[index][2].setEnabled(True)
+            else:
+                self.reportError("saved config must have a name", "error")
+                return
+
             # check if user is overwriting exisiting config
             if button_dict[index][3].findText(button_dict[index][0].text()) != -1:
                 return
@@ -448,7 +455,7 @@ class App(QMainWindow):
                 combo_box.addItem(row)
             combo_box.currentIndexChanged.connect(loadCsvConfig)
             instructions = QLabel("To save the above column labels for later "
-                                  "use, name the configuration and press save")
+                                  "use, name the configuration and click save")
             instructions.adjustSize()
             line = QLineEdit()
             line.setPlaceholderText("Enter the name of this configuration")
