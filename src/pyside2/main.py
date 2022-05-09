@@ -295,9 +295,6 @@ class App(QMainWindow):
             if len(new_config[0]) > 0:
                 self.wire_report_configs.add(new_config)
                 # deactivate buttons to edit and activate button that deletes
-                button_dict[index][0].setEnabled(False)
-                button_dict[index][1].setEnabled(False)
-                button_dict[index][2].setEnabled(True)
             else:
                 self.reportError("saved config must have a name", "error")
                 return
@@ -308,6 +305,7 @@ class App(QMainWindow):
             # update each combobox holding configs
             for key, _ in button_dict.items():
                 button_dict[key][3].addItem(button_dict[index][0].text())
+                button_dict[key][2].setEnabled(True)
                 button_dict[key][3].update()
 
         def deleteNewConfig(button_dict):
@@ -317,27 +315,38 @@ class App(QMainWindow):
                     line: QlineEdit contains the name of the config to be deleted
                     save: save button that is enabled by this method
                     delete: button that deletes config
-                    combo_box: conatins all saved csv configs. contents are
+                    combo_box: QComboBox that contains all saved csv configs. contents are
                                updated in this method
                 Deletes the user specified saved config from the csv file,
                 disables the delete button, and renables the save button and line edit
             """
             index = self.wire_report_list.currentRow()
-            self.wire_report_configs.delete(button_dict[index][0].text())
-
-            # deactivate buttons to edit and activate button that deletes
-            button_dict[index][0].setEnabled(True)
-            button_dict[index][1].setEnabled(True)
-            button_dict[index][2].setEnabled(False)
+            line = button_dict[index][0]
+            config_selector = button_dict[index][3]
+            if len(line.text()) > 0:
+                config_to_delete = line.text()
+                self.wire_report_configs.delete(config_to_delete)
+            elif config_selector.currentIndex() != 0:
+                config_to_delete = config_selector.currentText()
+                self.wire_report_configs.delete(config_to_delete)
+            else:
+                self.reportError("Choose a config to delete, or type its name", "error")
+                return
 
             # update each combobox holding configs
             for key in button_dict.keys():
-                box_to_remove = button_dict[key][3].findText(button_dict[index][0].text())
+                config_selector = button_dict[key][3]
+                line = button_dict[key][0]
+                if line.text() == config_to_delete:
+                    line.setText("")
+                deleted_box = config_selector.findText(config_to_delete)
                 # if the item is not in the combobox skip
-                if box_to_remove == -1:
+                if deleted_box <= 0:
                     continue
-                button_dict[key][3].removeItem(box_to_remove)
-                button_dict[key][3].update()
+                config_selector.removeItem(deleted_box)
+                config_selector.update()
+                if config_selector.count() == 1:
+                    button_dict[key][2].setEnabled(False)
 
         def loadCsvConfig():
             """
@@ -463,7 +472,12 @@ class App(QMainWindow):
             line.adjustSize()
             save_button = QPushButton("Save")
             delete_button = QPushButton("Delete")
-            delete_button.setEnabled(False)
+            # if there's items to delete, enable the button
+            if combo_box.count() == 1:
+                delete_button.setEnabled(False)
+            else:
+                delete_button.setEnabled(True)
+
             csv_config_buttons.update({item: [line, save_button, delete_button, combo_box]})
 
             # add widgets to container and fix formatting
