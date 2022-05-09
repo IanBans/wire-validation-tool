@@ -16,16 +16,26 @@ class CsvConfig:
         self.filename = filename
         self.gui = gui
         # tests if the csv file can be opened
-        # if not, create a new one
+        # if not, create a new one, and add instructions
         try:
             with open(self.filename, 'r') as file:
                 file.close()
         except FileNotFoundError:
-            log = "config file not found, creating new one at" + str(self.filename)
-            print(log)
             new_file = open(self.filename, 'w')
+            info_str = ("# This file stores column number configurations"
+                        " for the validation tool\n")
+            new_file.write(info_str)
+            info_str = ("# you can add or delete your own configurations"
+                        " if the format is followed\n")
+            new_file.write(info_str)
+            new_file.write("# lines starting with # will be ignored\n")
+            info_str = ("# the configurations store the column numbers of the following columns"
+                        " of the reports:\n")
+            new_file.write(info_str)
+            info_str = ("# configuration name, from component, from pin, to component, "
+                        "to pin, wire CSA, wire id number\n")
+            new_file.write(info_str)
             new_file.close()
-
         self.clean()
 
     def search(self, name):
