@@ -82,10 +82,10 @@ class InputParser:
             self.gui.reportError("could not find PDC file at " + str(filename), "warning")
             return
         except KeyError:
-            err_str = ("PDC "+ str(basename(filename)) + " has incorrect format. \n"
+            err_str = ("PDC " + str(basename(filename)) + " has incorrect format. \n"
                        "ensure first line header matches format 'CONNECTOR, PIN, FUSE RATING'")
             self.gui.reportError(err_str, "error")
-
+            return
 
     def readReport(self, filename, from_labels, to_labels, csa, desc):
         """
