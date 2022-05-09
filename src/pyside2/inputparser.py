@@ -1,5 +1,5 @@
 import csv
-import os
+from os.path import basename
 from report import Report
 
 
@@ -50,11 +50,11 @@ class InputParser:
             Each element in the list is a row of the PDC file, in dict format
             {CONNECTOR: (component,pin), FUSE:fuse rating}
         """
-        if filename:
+        try:
             contents_list = []
             with open(filename, mode='rt') as csv_file:
                 pdc_dict = csv.DictReader(csv_file, delimiter=',')
-                name = os.path.basename(filename)
+                name = basename(filename)
                 for i, line in enumerate(pdc_dict):
                     contents = {}
                     if line["CONNECTOR"] and line["PIN"]:
@@ -78,10 +78,14 @@ class InputParser:
                     self.gui.reportError(log, "log")
                 return contents_list
 
-        else:
-            print("invalid filename passed to readPDC...")
-            self.gui.reportError("invalid filename passed to readPDC...", "warning")
-            return False
+        except FileNotFoundError:
+            self.gui.reportError("could not find PDC file at " + str(filename), "warning")
+            return
+        except KeyError:
+            err_str = ("PDC "+ str(basename(filename)) + " has incorrect format. \n"
+                       "ensure first line header matches format 'CONNECTOR, PIN, FUSE RATING'")
+            self.gui.reportError(err_str, "error")
+
 
     def readReport(self, filename, from_labels, to_labels, csa, desc):
         """
