@@ -4,7 +4,7 @@ from os.path import dirname, basename
 from PySide2.QtWidgets import QWidget, QStackedWidget, QMainWindow, QGridLayout, QLabel
 from PySide2.QtWidgets import QFormLayout, QFileDialog, QComboBox, QPushButton
 from PySide2.QtWidgets import QListWidget, QScrollBar, QListWidgetItem
-from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QHBoxLayout
+from PySide2.QtWidgets import QApplication, QFrame, QLineEdit, QHBoxLayout, QVBoxLayout
 from PySide2.QtGui import Qt, QColor
 from openpyxl import load_workbook
 from inputparser import InputParser
@@ -206,7 +206,7 @@ class App(QMainWindow):
                                                        'Excel Files (*.xlsx)')
             if save_file:
                 self.export.setSavePath(save_file)
-                save_label.setText(self.export.getSavePath())
+                save_label.setText("Save Path: " + self.export.getSavePath())
 
         file_picker_widgets = QWidget()
         file_picker_layout = QGridLayout()
@@ -216,8 +216,14 @@ class App(QMainWindow):
         next_button = QPushButton('Next')
         pdc_button = QPushButton('Add PDC')
         wire_button = QPushButton('Add Wire Reports')
-        save = QPushButton("Choose Where to Save ...")
+        save = QPushButton("Choose Save Location...")
+        button_layout = QVBoxLayout()
+        box_layout = QHBoxLayout()
+        button_layout.addWidget(save)
+        button_layout.addWidget(next_button)
+
         save_label = QLabel()
+        save_label.setText("Save Path: " + self.export.getSavePath())
         save.clicked.connect(openSaveFileDialog)
         self.stacked_widget.addWidget(file_picker_widgets)
         file_picker_widgets.setLayout(file_picker_layout)
@@ -243,9 +249,9 @@ class App(QMainWindow):
         next_button.clicked.connect(self.setupWireReports)
         next_button.clicked.connect(lambda: self.goToPage('wire_reports'))
         next_button.setEnabled(False)
-        file_picker_layout.addWidget(next_button, 2, 0, 2, 2)
-        file_picker_layout.addWidget(save, 1, 0, 1, 2)
-        file_picker_layout.addWidget(save_label, 1, 1, 1, 1, Qt.AlignLeft)
+        box_layout.addLayout(button_layout)
+        box_layout.addWidget(save_label)
+        file_picker_layout.addLayout(box_layout, 2, 0, 2, 2)
         save.setMaximumWidth(200)
         next_button.setMaximumWidth(200)
 
