@@ -17,7 +17,7 @@ class Report:
         read(): reads the report stored in filepath and adds it to sheet_list
     """
 
-    def __init__(self, filepath, from_labels, to_labels, csa, desc):
+    def __init__(self, filepath, from_labels, to_labels, csa, desc, gui):
         self.filepath = filepath
         self.filename = os.path.basename(filepath)
         self.to_labels = to_labels
@@ -25,6 +25,7 @@ class Report:
         self.csa = csa
         self.desc = desc
         self.sheet_list = []
+        self.gui = gui
         self.read()
 
     def getContents(self):
@@ -38,19 +39,9 @@ class Report:
             reads the report from filepath and stores output in sheet_list, or empty list if
             reading unsuccessful
         """
-        # maps column names to column numbers for identification
-        def mapColumnNames(report):
-            names = {}
-            for first_row in report.iter_rows(1, 1, 1, sheet.max_column, True):
-                row = first_row
-            for num in range(0, sheet.max_column):
-                names[row[num]] = num
-            return names
-
-        if self.filepath:
+        try:
             workb = load_workbook(self.filepath, read_only=True)
             sheet = workb.active
-            column_map = mapColumnNames(sheet)
             # creates a list of NoneType to check for empty rows
             empty = [None] * sheet.max_column
             try:
@@ -59,17 +50,23 @@ class Report:
                     row_list = list(row)
                     # if row is empty, don't process it
                     if row_list != empty:
-                        row_dict["FROM"] = (row[column_map[self.from_labels[0]]],
-                                            row[column_map[self.from_labels[1]]])
-                        row_dict["TO"] = (row[column_map[self.to_labels[0]]],
-                                          row[column_map[self.to_labels[1]]])
-                        row_dict["CSA"] = row[column_map[self.csa]]
-                        row_dict["DESC"] = row[column_map[self.desc]]
+                        row_dict["FROM"] = (row[self.from_labels[0]],
+                                            row[self.from_labels[1]])
+                        row_dict["TO"] = (row[self.to_labels[0]],
+                                          row[self.to_labels[1]])
+                        row_dict["CSA"] = row[self.csa]
+                        row_dict["DESC"] = row[self.desc]
                         self.sheet_list.append(row_dict)
-                print("successfully read report: ", self.filename)
+                log = "successfully read report: " + str(self.filename)
+                print(log)
+                self.gui.reportError(log, "log")
                 return self.sheet_list
             except KeyError as error:
-                print("check column label " + str(error) + " matches file")
+                log = "check column number " + str(error) + " is correct"
+                print(log)
+                self.gui.reportError(log, "error")
                 return []
-        else:
-            print("bad filename in Report.read")
+        except FileNotFoundError:
+            log = "Could not find a file at" + str(self.filepath)
+            print(log, "error")
+            return []
