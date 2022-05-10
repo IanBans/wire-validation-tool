@@ -1,7 +1,12 @@
-﻿et-xmlfile==1.1.0
+cx-Freeze==6.10
+cx-Logging==3.0
+decorator==4.4.2
+et-xmlfile==1.1.0
+importlib-metadata==4.11.3
+lief==0.12.1
+networkx==2.5.1
 openpyxl==3.0.9
 PySide2==5.15.2
 shiboken2==5.15.2
 shiboken6==6.2.1
-decorator==4.4.2
-networkx==2.5.1
+zipp==3.8.0
