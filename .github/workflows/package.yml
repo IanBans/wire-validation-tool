@@ -14,7 +14,6 @@ jobs:
           - os: windows-latest
             name: windows
             python-version: 3.9.12
-            path: ${{github.workspace}}\\src\\pyside2
     steps:
     - name: checkout repository
       uses: actions/checkout@v2
@@ -26,13 +25,13 @@ jobs:
       run: |
         pip install -r $(git ls-files '*requirements.txt')
     - name: freeze exe
-      run: "./build-dist.ps1 ${{ matrix.path }}"
+      run: "./build-dist.ps1 ${{github.workspace}}\\src\\pyside2"
     - name: Zip release
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
         filename: dist-${{matrix.name}}.zip
-        path: ${{ matrix.path }}
+        path: ${{github.workspace}}\\src\\pyside2\\dist
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
