@@ -14,9 +14,12 @@ jobs:
           - os: windows-latest
             name: windows
             python-version: 3.9.12
+            dir: devops
     steps:
     - name: checkout repository
       uses: actions/checkout@v2
+      with:
+        path: ${{ matrix.dir }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -26,8 +29,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r $(git ls-files '*requirements.txt')
     - name: freeze exe
-      run: |
-        "python3 $(git ls-files '*build.py') bdist_msi"
+      run: python3 ${{ matrix.dir }}/src/pyside2/build.py bdist_msi
     - name: Zip release
       uses: thedoctor0/zip-release@master
       with:
