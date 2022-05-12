@@ -33,5 +33,7 @@ The summary will also denote any wires which present a risk of overheating due t
 This program will not be able to design, edit, or visually display wiring harness schematics.
 
 ## Build Instructions
-To build the python script to a windows installer or windows exe with cx_freeze, install dependencies `pip3 install -r requirements.txt` then run `python3 build.py bdist_msi` or `python3 build.py setup_exe.`
- find the installer in the `build` folder
+To build the python script to a windows installer or windows exe with cx_freeze download Python 3.9.12. Install the dependencies with pip `pip3 install -r src/requirements.txt` then navigate to `/src/pyside2` and run `python3 build.py bdist_msi` or `python3 build.py setup_exe.`
+find the installer in `/src/pyside2/dist`
+
+To run the app directly from source. Clone the repository and install the dependencies using Python 3.9.12. `pip3 install -r src/requirements.txt` navigate to `/src/pyside2` and run `python3 main.py`
