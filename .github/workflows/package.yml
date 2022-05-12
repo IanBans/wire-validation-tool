@@ -14,7 +14,6 @@ jobs:
           - os: windows-latest
             name: windows
             python-version: 3.9.12
-            dir: devops
     steps:
     - name: checkout repository
       uses: actions/checkout@v2
@@ -26,15 +25,15 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip install -r ${{ matrix.dir }}/requirements.txt
+        pip install -r \requirements.txt
     - name: freeze exe
-      run: python3 ${{ matrix.dir }}/src/pyside2/build.py bdist_msi
+      run: python3 src\pyside2\build.py bdist_msi
     - name: Zip release
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
         filename: dist-${{matrix.name}}.zip
-        path: ${{ matrix.dir }}/src/pyside2/dist
+        path: /src/pyside2/dist
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
