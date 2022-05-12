@@ -27,7 +27,7 @@ jobs:
         pip install -r $(git ls-files '*requirements.txt')
     - name: freeze exe
       run: |
-        "python3 $(git ls-files '/src/pyside2/build.py') bdist_msi"
+        "python3 $(git ls-files *build.py') bdist_msi"
     - name: Zip release
       uses: thedoctor0/zip-release@master
       with:
