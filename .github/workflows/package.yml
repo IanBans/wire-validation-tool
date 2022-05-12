@@ -29,12 +29,13 @@ jobs:
       run: |
         "python3 ./src/pyside2/build.py bdist_msi"
     - name: Zip release
-    - uses: thedoctor0/zip-release@master
+      uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
         filename: dist-${{matrix.name}}.zip
         path: /src/pyside2/dist
-    - uses: actions/upload-artifact@v2
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.os }}
         path: dist-${{ matrix.name }}.zip
