@@ -1,1 +1,2 @@
-python3 $args[0] bdist_msi
+cd $args[0]
+python3 build.py bdist_msi
