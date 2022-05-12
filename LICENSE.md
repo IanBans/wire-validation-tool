@@ -1,4 +1,4 @@
-Copyright (c) 2022 Ian McCleary, Ian Basenauer, Martin Armanasu, Jaden Breeland
+Copyright (c) 2022 Ian McCleary, Ian Bansenauer, Martin Armanasu, Jaden Breeland
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
