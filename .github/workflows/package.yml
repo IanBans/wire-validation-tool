@@ -25,7 +25,7 @@ jobs:
       run: |
         pip install -r $(git ls-files '*requirements.txt')
     - name: freeze exe
-      run: "./build-dist.ps1 ${{github.workspace}}\src\pyside2"
+      run: "./build-dist.ps1 ${{github.workspace}}\\src\\pyside2"
     - name: Zip release
       uses: thedoctor0/zip-release@master
       with:
