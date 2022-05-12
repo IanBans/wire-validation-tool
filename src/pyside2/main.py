@@ -58,6 +58,15 @@ class App(QMainWindow):
         """
         return self.console_widget
 
+    def onBackButtonClicked(self):
+        """
+        clicklistener for 'back button'
+        clears the status console and
+        returns to file picker
+        """
+        self.goToPage("file_picker")
+        self.console_widget.clear()
+
     def reportError(self, error_code, error_type):
         """
             error_code: string that specifies what type of error recieved
@@ -74,6 +83,7 @@ class App(QMainWindow):
 
         item.setTextColor(print_color)
         self.console_widget.addItem(item)
+        self.console_widget.scrollToBottom()
         print(error_code, error_type)
 
     def setupUI(self):
@@ -82,8 +92,7 @@ class App(QMainWindow):
         """
         # the stacked widget is the app container that swaps which widget is shown
         # Each widget is a page
-        self.stacked_widget.setMinimumSize(800, 500)
-        self.stacked_widget.resize(800, 500)
+        self.stacked_widget.setMinimumSize(1050, 750)
         self.stacked_widget.setWindowTitle('Paccar Wire Validation Tool')
         # self.pages collects all created pages for navigation
         self.pages = {}
@@ -550,7 +559,7 @@ class App(QMainWindow):
 
         page_layout.addWidget(console_label, 2, 0, 1, 2)
         page_layout.addWidget(self.console_widget, 3, 0, 1, 2)
-        back.clicked.connect(lambda: self.goToPage("file_picker"))
+        back.clicked.connect(lambda: self.onBackButtonClicked())
 
         submit.clicked.connect(makeDict)
         submit.clicked.connect(sendReports)
