@@ -26,8 +26,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r $(git ls-files '*requirements.txt')
+        pip install -r ${{ matrix.dir }}/requirements.txt
     - name: freeze exe
       run: python3 ${{ matrix.dir }}/src/pyside2/build.py bdist_msi
     - name: Zip release
@@ -35,7 +34,7 @@ jobs:
       with:
         type: 'zip'
         filename: dist-${{matrix.name}}.zip
-        path: /src/pyside2/dist
+        path: ${{ matrix.dir }}/src/pyside2/dist
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
