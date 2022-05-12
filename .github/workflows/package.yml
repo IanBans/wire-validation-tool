@@ -23,9 +23,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip install -r ${{ github.workspace }}/requirements.txt
+        pip install -r requirements.txt
     - name: freeze exe
-      run: "./build-dist.ps1 ${{ github.workspace }}/src/pyside2/build.py"
+      run: "./build-dist.ps1 $(git ls-files '*build.py')"
     - name: Zip release
       uses: thedoctor0/zip-release@master
       with:
